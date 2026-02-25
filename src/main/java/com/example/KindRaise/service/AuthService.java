@@ -1,0 +1,131 @@
+package com.example.KindRaise.service;
+
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.example.KindRaise.jwt.JwtUtils;
+import com.example.KindRaise.model.User;
+import com.example.KindRaise.repository.UserRepository;
+
+@Service
+public class AuthService {
+
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    AuthenticationManager authenticationManager;
+
+    @Autowired
+    JwtUtils jwtUtils;
+
+    public ResponseEntity<?> registerUser(User user,MultipartFile file){
+        Map<String,Object> responseObject=new HashMap<>();
+        try {
+           User isAlreadyExistsUsername=this.userRepository.findByUsername(user.getUsername());
+           if(isAlreadyExistsUsername!=null){
+            responseObject.put("message", "Username already exists!");
+            responseObject.put("status",false);
+            return new ResponseEntity<>(responseObject,HttpStatus.UNAUTHORIZED);
+           }
+
+           User isAlreadyExistsPhone=this.userRepository.findByPhone(user.getPhone());
+           if(isAlreadyExistsPhone!=null){
+            responseObject.put("message", "Phone number already registered!");
+            responseObject.put("status",false);
+            return new ResponseEntity<>(responseObject,HttpStatus.UNAUTHORIZED);
+           }
+
+           user.setPassword(new BCryptPasswordEncoder(12).encode(user.getPassword()));
+
+           user.setImageData(file.getBytes());
+           user.setImageName(file.getOriginalFilename());
+           user.setImageType(file.getContentType());
+
+           this.userRepository.save(user);
+
+            responseObject.put("message", "User Created SuccessFully");
+            responseObject.put("status",true);
+            responseObject.put("role", user.getRole());
+            responseObject.put("username", user.getUsername());
+
+           return new ResponseEntity<>(responseObject,HttpStatus.CREATED);
+
+
+        } catch (Exception e) {
+            responseObject.put("message", e.getMessage());
+            responseObject.put("status",false);
+            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<?> createAdmin(User user){
+
+          Map<String,Object> responseObject=new HashMap<>();
+
+          try {
+             User isAlreadyExistsUsername=this.userRepository.findByUsername(user.getUsername());
+
+            if(isAlreadyExistsUsername!=null){
+                responseObject.put("message", "Username already exists!");
+                responseObject.put("status",false);
+                return new ResponseEntity<>(responseObject,HttpStatus.UNAUTHORIZED);
+            }
+
+            user.setPassword(new BCryptPasswordEncoder(12).encode(user.getPassword()));
+
+            this.userRepository.save(user);
+
+            responseObject.put("message", "Admin Created SuccessFully!");
+            responseObject.put("status",true);
+            responseObject.put("role", user.getRole());
+            responseObject.put("username", user.getUsername());
+
+           return new ResponseEntity<>(responseObject,HttpStatus.CREATED);
+
+          } catch (Exception e) {
+            responseObject.put("message", e.getMessage());
+            responseObject.put("status",false);
+            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+          }
+
+    }
+
+    public ResponseEntity<?> loginUser(User user) {
+         Map<String,Object> responseObject=new HashMap<>();
+        try {
+            Authentication authentication=this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
+
+            String access_token=this.jwtUtils.generateTokenWithUsername(user.getUsername());
+
+            responseObject.put("message","Login Sucess!");
+            responseObject.put("status",false);
+            responseObject.put("access_token", access_token);
+          
+
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            return new ResponseEntity<>(responseObject,HttpStatus.OK);
+
+        } catch (Exception e) {
+            responseObject.put("message", "Login Failed "+e.getMessage());
+            responseObject.put("status",false);
+
+             return new ResponseEntity<>(responseObject,HttpStatus.NOT_FOUND);
+        }
+    }
+
+}
