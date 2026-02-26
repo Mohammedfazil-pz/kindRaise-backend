@@ -1,0 +1,50 @@
+package com.example.KindRaise.model;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+import org.hibernate.annotations.UuidGenerator;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Campaign {
+    @Id
+    @GeneratedValue
+    @UuidGenerator
+    private String id;
+    @Column(nullable = false)
+    private String title;
+     @Column(nullable = false)
+    private String description;
+     @Column(nullable = false)
+    private BigDecimal goalAmount;
+     @Column(nullable = false)
+    private LocalDate deadline;
+    private String status;
+    @JsonIgnore
+    @Lob
+    private byte[] imageData;
+    private String imageName;
+    private String imageType;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+
+}

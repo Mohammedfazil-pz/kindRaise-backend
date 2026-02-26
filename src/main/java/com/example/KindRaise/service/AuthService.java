@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.KindRaise.jwt.JwtUtils;
+import com.example.KindRaise.model.Notification;
 import com.example.KindRaise.model.User;
 import com.example.KindRaise.repository.UserRepository;
 
@@ -31,8 +32,17 @@ public class AuthService {
     @Autowired
     JwtUtils jwtUtils;
 
+    @Autowired
+    NotificationService notificationService;
+
+
+
+     Map<String,Object> responseObject=new HashMap<>();
+
     public ResponseEntity<?> registerUser(User user,MultipartFile file){
-        Map<String,Object> responseObject=new HashMap<>();
+        Notification adminNotification=new Notification();
+     
+
         try {
            User isAlreadyExistsUsername=this.userRepository.findByUsername(user.getUsername());
            if(isAlreadyExistsUsername!=null){
@@ -56,6 +66,9 @@ public class AuthService {
 
            this.userRepository.save(user);
 
+          adminNotification.setTitle("New Account Registration");
+          adminNotification.setMessage("A new user with username : "+user.getUsername() +" has been successfully created an account");
+
             responseObject.put("message", "User Created SuccessFully");
             responseObject.put("status",true);
             responseObject.put("role", user.getRole());
@@ -73,7 +86,7 @@ public class AuthService {
 
     public ResponseEntity<?> createAdmin(User user){
 
-          Map<String,Object> responseObject=new HashMap<>();
+         Notification adminNotification=new Notification();
 
           try {
              User isAlreadyExistsUsername=this.userRepository.findByUsername(user.getUsername());
@@ -87,6 +100,9 @@ public class AuthService {
             user.setPassword(new BCryptPasswordEncoder(12).encode(user.getPassword()));
 
             this.userRepository.save(user);
+
+           adminNotification.setTitle("Admin Account Created");
+           adminNotification.setMessage("Administrator '" + user.getUsername() + "' has been successfully added.");
 
             responseObject.put("message", "Admin Created SuccessFully!");
             responseObject.put("status",true);
@@ -104,7 +120,7 @@ public class AuthService {
     }
 
     public ResponseEntity<?> loginUser(User user) {
-         Map<String,Object> responseObject=new HashMap<>();
+        
         try {
             Authentication authentication=this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
 
