@@ -4,16 +4,18 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.KindRaise.dtos.CampaignDto;
+import com.example.KindRaise.dtos.CampaignImageDto;
 import com.example.KindRaise.model.Campaign;
 import com.example.KindRaise.model.Notification;
 import com.example.KindRaise.model.User;
@@ -148,22 +150,108 @@ public class CampaignService {
 
     public ResponseEntity<?> updateStatusCampaign(String campaignId, String status) {
         try {
-            Campaign campaign=this.campaignRepository.findById(campaignId).orElse(null);
-            if(campaign==null){
+            Optional<Campaign> checkingCampaign=this.campaignRepository.findById(campaignId);
+            if(checkingCampaign.isEmpty()){
                  responseObject.put("message", "Campaign not found id: "+campaignId);
                  responseObject.put("status", false);
                 return new ResponseEntity<>(responseObject,HttpStatus.NOT_FOUND);
             }
+            
+            Campaign campaign=checkingCampaign.get();
+
             campaign.setStatus(status);
             this.campaignRepository.save(campaign);
 
-            responseObject.put("message", "Campaign Status updated Successfully.");
+            Notification userNotification=new Notification();
+
+            userNotification.setTitle("Campaign " + status);
+            userNotification.setMessage("Your campaign '" + campaign.getTitle() + "' has been " + status + ".");
+            userNotification.setUser(campaign.getUser());
+            userNotification.setCreatedAt(LocalDateTime.now());
+
+            responseObject.put("message", "Campaign Status updated Successfully!");
             responseObject.put("status", true);
+
+            this.notificationService.addNotification(userNotification);
 
             return new ResponseEntity<>(responseObject,HttpStatus.OK);
 
         } catch (Exception e) {
             responseObject.put("message", "Failed while updated the status of Campaign"+e.getMessage());
+            responseObject.put("status", false);
+
+            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @Transactional
+    public ResponseEntity<?> getCampaignImage(String id) {
+        try {
+            Optional<CampaignImageDto> imageChecking=this.campaignRepository.getCampaignImage(id);
+            if(imageChecking.isEmpty()){
+                responseObject.put("message", "image not found");
+                responseObject.put("status", false);
+                return new ResponseEntity<>(responseObject,HttpStatus.NOT_FOUND);
+            } 
+
+            CampaignImageDto imageData=imageChecking.get();
+             
+            return ResponseEntity.ok().contentType(MediaType.parseMediaType(imageData.getImageType())).body(imageData.getImageData());
+
+        } catch (Exception e) {
+            responseObject.put("message", "Failed while fetching campaign image "+e.getMessage());
+            responseObject.put("status", false);
+
+            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<?> updateCampaign(String id,Campaign campaign,MultipartFile file){
+        try {
+
+            Optional<Campaign> isCampaignExists=this.campaignRepository.findById(id);
+            if(isCampaignExists.isEmpty()){
+                responseObject.put("message", "Campaign not found");
+                responseObject.put("status", false);
+                return new ResponseEntity<>(responseObject, HttpStatus.NOT_FOUND);
+            }
+
+            Campaign campaignData=isCampaignExists.get();
+
+            campaignData.setTitle(campaign.getTitle());
+            campaignData.setDescription(campaign.getDescription());
+            campaignData.setGoalAmount(campaign.getGoalAmount());
+            campaignData.setDeadline(campaign.getDeadline());
+
+            if(file!=null && !file.isEmpty()){
+                campaignData.setImageData(file.getBytes());
+                campaignData.setImageName(file.getOriginalFilename());
+                campaignData.setImageType(file.getContentType());
+            }
+
+            this.campaignRepository.save(campaignData);
+
+            responseObject.put("message", "Campaign updated successfully!");
+            responseObject.put("status", true);
+
+            return new ResponseEntity<>(responseObject, HttpStatus.OK);
+        
+        } catch (Exception e) {
+            responseObject.put("message", "Failed to update campaign "+e.getMessage());
+            responseObject.put("status", false);
+
+            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<?> deleteCampaign(String id){
+        try {
+            this.campaignRepository.deleteById(id);
+             responseObject.put("message", "Campaign Removed successfully!");
+             responseObject.put("status", true);
+
+            return new ResponseEntity<>(responseObject, HttpStatus.OK);
+        } catch (Exception e) {
+            responseObject.put("message", "Failed to Delete campaign "+e.getMessage());
             responseObject.put("status", false);
 
             return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,7 +28,7 @@ public class CampaignController {
     
     @PostMapping("/create")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    public ResponseEntity<?> createCampaign(@RequestPart("campaign") Campaign campaign,@RequestPart MultipartFile file){
+    public ResponseEntity<?> createCampaign(@RequestPart("campaign") Campaign campaign,@RequestPart("file") MultipartFile file){
         return this.campaignService.createCampaign(campaign,file);
     }
 
@@ -42,6 +43,19 @@ public class CampaignController {
     public ResponseEntity<?> getSingleCampaignById(@PathVariable("id") String id){
         return this.campaignService.getSingleCampaignById(id);
     }
+
+    @PutMapping("/update/campaign/{id}")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    public ResponseEntity<?> updateCampaign(@PathVariable("id") String id,@RequestPart("campaign") Campaign campaign,@RequestPart("file") MultipartFile file ){
+        return this.campaignService.updateCampaign(id, campaign, file);
+    }
+
+    @DeleteMapping("/delete/campaign/{id}")
+     @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    public ResponseEntity<?> deleteCampaign(@PathVariable("id") String id){
+        return this.campaignService.deleteCampaign(id);
+    }
+
 
     @GetMapping("/active/campaigns")
     public ResponseEntity<?> getActiveCampaigns(){
@@ -60,5 +74,16 @@ public class CampaignController {
     public ResponseEntity<?> updateStatusCampaign(@PathVariable("campaignID") String campaignId,@PathVariable("status") String status){
         return this.campaignService.updateStatusCampaign(campaignId,status);
     }
+
+    @GetMapping("/image/campaign/{id}")
+    public ResponseEntity<?> getCampaignImage(@PathVariable("id") String id){
+        return this.campaignService.getCampaignImage(id);
+    }
+
+   
+
+    
+
+   
 
 }

@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.example.KindRaise.dtos.CampaignDto;
+import com.example.KindRaise.dtos.CampaignImageDto;
 import com.example.KindRaise.model.Campaign;
 
 @Repository
@@ -69,5 +70,9 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
             ) FROM Campaign c
             """)
     List<CampaignDto> findAllCampaignsWithDto();
+    @Query("""
+            SELECT new com.example.KindRaise.dtos.CampaignImageDto(c.imageData,c.imageType) FROM Campaign c WHERE c.id=:id
+            """)
+    Optional<CampaignImageDto> getCampaignImage(@Param("id") String id);
 
 }

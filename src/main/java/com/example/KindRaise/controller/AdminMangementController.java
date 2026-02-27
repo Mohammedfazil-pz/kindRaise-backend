@@ -25,4 +25,6 @@ public class AdminMangementController {
     public ResponseEntity<?> createAdmin(@RequestBody User user){
         return this.authService.createAdmin(user);
     }
+
+    
 }
