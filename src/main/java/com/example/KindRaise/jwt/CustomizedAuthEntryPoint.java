@@ -25,6 +25,8 @@ public class CustomizedAuthEntryPoint implements AuthenticationEntryPoint{
 
         Map<String,Object> errorObject=new HashMap<>();
 
+        System.out.println(authException);
+
         errorObject.put("message", "Token error. " +authException.getMessage());
         errorObject.put("status", false);
 

@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.example.KindRaise.security.CustomizedUserDetailsService;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,19 +25,20 @@ public class JwtFilter extends OncePerRequestFilter{
     private JwtUtils jwtUtils;
 
     @Autowired
-    private UserDetailsService userDetailsService;
+    private CustomizedUserDetailsService customizedUserDetailsService;
     
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             String extractedTokenFromHeader=this.jwtUtils.extractTokenFromHeader(request);
+          ;
             if(extractedTokenFromHeader!=null&&this.jwtUtils.validateToken(extractedTokenFromHeader)){
-    
+              
                 String username=this.jwtUtils.extractUserIdFromToken(extractedTokenFromHeader);
-
-                UserDetails userDetails=this.userDetailsService.loadUserByUsername(username);
-
+             
+                UserDetails userDetails=this.customizedUserDetailsService.loadUserByUsername(username);
+               
                 Authentication userObjectForSecurityHolder=new UsernamePasswordAuthenticationToken
                 (userDetails.getUsername(),null,userDetails.getAuthorities());
 
@@ -43,6 +46,7 @@ public class JwtFilter extends OncePerRequestFilter{
 
             }
         } catch (Exception e) {
+            System.out.println(e);
             throw new ServletException("Something wrong with token!");
         }
         

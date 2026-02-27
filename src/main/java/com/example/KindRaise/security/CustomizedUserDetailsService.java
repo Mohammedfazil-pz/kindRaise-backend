@@ -19,7 +19,7 @@ public class CustomizedUserDetailsService implements UserDetailsService{
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         com.example.KindRaise.model.User user= this.userRepository.findByUsername(username);
         if(user!=null){
-            return User.builder().username(user.getUsername()).password(user.getPassword()).build();
+            return User.builder().username(user.getUsername()).password(user.getPassword()).roles(user.getRole()).build();
         }
         throw new UsernameNotFoundException("Invalid credentials");
     }

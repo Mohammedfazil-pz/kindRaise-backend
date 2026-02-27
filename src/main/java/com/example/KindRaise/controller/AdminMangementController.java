@@ -16,7 +16,7 @@ import com.example.KindRaise.service.AuthService;
 @RestController
 @RequestMapping("/api/admin")
 @PreAuthorize("hasRole('ADMIN')")
-public class AdminController {
+public class AdminMangementController {
 
     @Autowired
     AuthService authService;
