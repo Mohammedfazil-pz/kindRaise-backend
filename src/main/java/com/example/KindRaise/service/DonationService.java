@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.example.KindRaise.dtos.CampaignDto;
-import com.example.KindRaise.model.Campaign;
+// import com.example.KindRaise.model.Campaign;
 import com.example.KindRaise.model.Donation;
 import com.example.KindRaise.model.PaymentTransaction;
 import com.example.KindRaise.repository.CampaignRepository;
