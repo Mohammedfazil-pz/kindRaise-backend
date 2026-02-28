@@ -2,6 +2,7 @@ package com.example.KindRaise.model;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.Column;
@@ -21,15 +22,17 @@ public class PaymentGateway {
     @GeneratedValue
     @UuidGenerator
     private String id;
-    @Column(nullable = false)
+ 
     private String name;
-     @Column(nullable = false)
+    
     private String apiKey;
-     @Column(nullable = false)
+    
     private String secretKey;
-     @Column(nullable = false)
+
     private String mode;
-     @Column(nullable = false)
+    
     private Boolean active;
+    @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 }
