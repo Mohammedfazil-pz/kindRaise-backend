@@ -1,5 +1,37 @@
-{"properties": [{
-  "name": "spring.jwt.secret.key",
-  "type": "java.lang.String",
-  "description": "A description for 'spring.jwt.secret.key'"
-}]}
+{"properties": [
+  {
+    "name": "spring.jwt.secret.key",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.jwt.secret.key'"
+  },
+  {
+    "name": "spring.paypal.test.url",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.paypal.test.url'"
+  },
+  {
+    "name": "spring.paypal.main.url",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.paypal.main.url'"
+  },
+  {
+    "name": "spring.paypal.test.token.url",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.paypal.test.token.url'"
+  },
+  {
+    "name": "spring.paypal.main.token.url",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.paypal.main.token.url'"
+  },
+  {
+    "name": "spring.paypal.test.order.url",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.paypal.test.order.url'"
+  },
+  {
+    "name": "spring.paypal.main.order.url",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.paypal.main.order.url'"
+  }
+]}
