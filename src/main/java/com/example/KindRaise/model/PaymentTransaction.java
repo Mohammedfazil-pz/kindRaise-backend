@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 
 import org.hibernate.annotations.UuidGenerator;
 
+import com.example.KindRaise.dtos.CampaignDto;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -43,10 +45,6 @@ public class PaymentTransaction {
      @ManyToOne
      @JoinColumn(name = "campaign_id")
      private Campaign campaign;
-
-     @ManyToOne
-     @JoinColumn(name = "payment_gatway_id")
-     private PaymentGateway paymentGateway;
 
 
 

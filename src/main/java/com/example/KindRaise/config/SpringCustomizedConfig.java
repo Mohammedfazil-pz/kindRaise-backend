@@ -36,6 +36,7 @@ public class SpringCustomizedConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity){
+        httpSecurity.cors(cors->{});
         httpSecurity.csrf(csrf->csrf.disable());
         httpSecurity.authorizeHttpRequests(httpRequests->httpRequests
             .requestMatchers("/api/register","/api/login","/api/admin/create/admin")
