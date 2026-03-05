@@ -12,11 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.example.KindRaise.dtos.CampaignDto;
 import com.example.KindRaise.dtos.DonationDto;
 import com.example.KindRaise.dtos.RazorPayResponseDto;
+import com.example.KindRaise.dtos.UserDonationDto;
 import com.example.KindRaise.model.Campaign;
 // import com.example.KindRaise.model.Campaign;
 import com.example.KindRaise.model.Donation;
@@ -112,7 +114,6 @@ public class DonationService {
             return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
        }
     }
-    // @Transactional
     public ResponseEntity<?> getDonationsOfCampaign(String id){
         try {
 
@@ -120,6 +121,32 @@ public class DonationService {
             return new ResponseEntity<>(donations,HttpStatus.OK);
         } catch (Exception e) {
             responseObject.put("message", "Failed to fetch campaign donations "+e.getMessage());
+            responseObject.put("status", false);
+
+            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<?> getUserDonations(){
+        try {
+
+            String username=SecurityContextHolder.getContext().getAuthentication().getName();
+            User userDetails=this.userRepository.findByUsername(username);
+            List<UserDonationDto> donations=this.donationRepository.findDonationByUserId(userDetails.getId());
+            return new ResponseEntity<>(donations,HttpStatus.OK);
+        } catch (Exception e) {
+            responseObject.put("message", "Failed to fetch User donations "+e.getMessage());
+            responseObject.put("status", false);
+
+            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    public ResponseEntity<?> getAllDonations() {
+        try {
+            List<DonationDto> donations=this.donationRepository.findAllDonationsByDto();
+            return new ResponseEntity<>(donations,HttpStatus.OK);
+        } catch (Exception e) {
+            responseObject.put("message", "Failed to fetch All donations "+e.getMessage());
             responseObject.put("status", false);
 
             return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);

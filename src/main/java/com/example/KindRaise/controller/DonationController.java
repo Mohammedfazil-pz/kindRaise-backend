@@ -2,6 +2,7 @@ package com.example.KindRaise.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,10 +20,24 @@ public class DonationController {
 
     @Autowired
     DonationService donationService;
+    
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<?> getDonationsOfCampaign(@PathVariable("id") String id){
         System.out.println(id);
         return this.donationService.getDonationsOfCampaign(id);
+    }
+
+    @GetMapping("/user")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    public ResponseEntity<?> getUserDonations(){
+        return this.donationService.getUserDonations();
+    }
+
+    @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getAllDonations(){
+        return this.donationService.getAllDonations();
     }
 }
