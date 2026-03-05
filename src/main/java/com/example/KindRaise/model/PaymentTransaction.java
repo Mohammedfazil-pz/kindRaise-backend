@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 import org.hibernate.annotations.UuidGenerator;
 
-import com.example.KindRaise.dtos.CampaignDto;
+
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

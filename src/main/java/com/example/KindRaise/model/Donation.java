@@ -26,6 +26,7 @@ public class Donation {
     private String id;
     private BigDecimal  amount;
     private LocalDate donationDate;
+    private String transactionId;
 
     @ManyToOne
     @JoinColumn(name = "campaign_id")

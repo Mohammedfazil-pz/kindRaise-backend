@@ -1,6 +1,7 @@
 package com.example.KindRaise.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import com.example.KindRaise.dtos.CampaignDto;
+
 import com.example.KindRaise.dtos.RazorPayResponseDto;
 import com.example.KindRaise.model.Campaign;
 import com.example.KindRaise.model.PaymentGateway;
@@ -45,6 +46,9 @@ public class RazorPayService {
 
     @Autowired
     TransactionRepository transactionRepository;
+
+    @Autowired
+    DonationService donationService;
 
     Map<String,Object> responseObject=new HashMap<>();
 
@@ -88,7 +92,7 @@ public class RazorPayService {
     }
 
 
-    public boolean verifySignature(RazorPayResponseDto razorPayResponseDto) {
+    public ResponseEntity<?> verifySignature(RazorPayResponseDto razorPayResponseDto) {
 
     try {
         Optional<PaymentGateway> gatewayOptional = paymentGatewayRepository.findByActiveTrue();
@@ -128,8 +132,11 @@ public class RazorPayService {
 
        Optional<Campaign> campaign=this.campaignRepository.findById(razorPayResponseDto.getCampaignID());
 
+       
        if(campaign.isEmpty()){
-        throw new RuntimeException("Campaign not found");
+          responseObject.put("message","Campaign not found");
+            responseObject.put("status", false);
+            return new ResponseEntity<>(responseObject, HttpStatus.BAD_REQUEST);
        }
 
        String username=SecurityContextHolder.getContext().getAuthentication().getName();
@@ -138,16 +145,35 @@ public class RazorPayService {
        User user= this.userRepository.findByUsername(username);
        Campaign campaignDto=campaign.get();
 
-       paymentTransaction.setAmount(razorPayResponseDto.getAmount());
-       paymentTransaction.setPaymentMethod(method);
-       paymentTransaction.setPaymentReference(razorPayResponseDto.getPaymentReference());
-       paymentTransaction.setTransactionDate(LocalDateTime.now());
-       paymentTransaction.setTransactionStatus(razorPayResponseDto.getTransactionStatus());
-       paymentTransaction.setCampaign(campaignDto);
-       paymentTransaction.setUser(user);
+       if(!campaignDto.getStatus().equals("ACTIVE")){
+            responseObject.put("message","Sorry you can't donate. The campaign is not active now.");
+            responseObject.put("status", false);
+            return new ResponseEntity<>(responseObject, HttpStatus.BAD_REQUEST);
 
-       this.transactionRepository.save(paymentTransaction);
-       return generatedSignature.equals(razorPayResponseDto.getRazorpay_signature());
+        }
+
+        if(campaignDto.getDeadline().isBefore(LocalDate.now())){
+            responseObject.put("message", "Sorry, you can't donate. The campaign deadline has expired.");
+            responseObject.put("status", false);
+            return new ResponseEntity<>(responseObject, HttpStatus.BAD_REQUEST);   
+        }
+
+            paymentTransaction.setAmount(razorPayResponseDto.getAmount());
+            paymentTransaction.setPaymentMethod(method);
+            paymentTransaction.setPaymentReference(razorPayResponseDto.getPaymentReference());
+            paymentTransaction.setTransactionDate(LocalDateTime.now());
+            paymentTransaction.setTransactionStatus(razorPayResponseDto.getTransactionStatus());
+            paymentTransaction.setCampaign(campaignDto);
+            paymentTransaction.setUser(user);
+
+            this.transactionRepository.save(paymentTransaction);
+
+            this.donationService.donateCampaign(campaignDto,razorPayResponseDto,user);
+
+            responseObject.put("message", "You donation is successfully added.");
+            responseObject.put("status", true);
+            return new ResponseEntity<>(responseObject, HttpStatus.CREATED);
+
 
     } catch (Exception e) {
         throw new RuntimeException("Signature verification failed");

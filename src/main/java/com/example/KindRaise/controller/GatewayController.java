@@ -35,13 +35,9 @@ public ResponseEntity<?> createOrder(@RequestBody PaymentRequestDto paymentReque
 @PostMapping("/verify")
 public ResponseEntity<?> verifyPayment(@RequestBody RazorPayResponseDto razorPayResponseDto) {
 
-    boolean isValid = this.razorPayService.verifySignature(razorPayResponseDto);
+ return this.razorPayService.verifySignature(razorPayResponseDto);
 
-    if (isValid) {
-        return ResponseEntity.ok("Payment Verified Successfully");
-    } else {
-        return ResponseEntity.badRequest().body("Invalid Signature");
-    }
+   
 }
 
 @PostMapping("/payment-failed")

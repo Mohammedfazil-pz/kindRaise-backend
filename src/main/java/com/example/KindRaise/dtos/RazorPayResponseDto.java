@@ -2,7 +2,6 @@ package com.example.KindRaise.dtos;
 
 import java.math.BigDecimal;
 
-import com.example.KindRaise.model.Campaign;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
