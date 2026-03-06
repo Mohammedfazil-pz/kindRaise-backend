@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PaymentRequestDto {
      private BigDecimal amount;
+     private String campaignId;
 }

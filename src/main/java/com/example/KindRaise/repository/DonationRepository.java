@@ -1,7 +1,7 @@
 package com.example.KindRaise.repository;
 
 import java.util.List;
-import java.util.Optional;
+
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,7 +16,7 @@ import com.example.KindRaise.model.Donation;
 public interface DonationRepository extends JpaRepository<Donation,String>{
     @Query("""
             SELECT new com.example.KindRaise.dtos.DonationDto(
-            d.id,d.amount,d.donationDate,d.transactionId,d.user.id,d.user.fullName
+            d.id,d.campaign.title,d.amount,d.donationDate,d.transactionId,d.user.id,d.user.fullName
             ) FROM Donation d WHERE d.campaign.id=:id
             """)
     List<DonationDto> findByCampaignIdByDto(@Param("id") String id);
@@ -30,7 +30,7 @@ public interface DonationRepository extends JpaRepository<Donation,String>{
 
     @Query("""
             SELECT new com.example.KindRaise.dtos.DonationDto(
-            d.id,d.amount,d.donationDate,d.transactionId,d.user.id,d.user.fullName
+            d.id,d.campaign.title,d.amount,d.donationDate,d.transactionId,d.user.id,d.user.fullName
             ) FROM Donation d 
             """)
     List<DonationDto> findAllDonationsByDto();

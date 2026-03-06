@@ -127,7 +127,7 @@ public class AuthService {
             String access_token=this.jwtUtils.generateTokenWithUsername(user.getUsername());
 
             responseObject.put("message","Login Sucess!");
-            responseObject.put("status",false);
+            responseObject.put("status",true);
             responseObject.put("access_token", access_token);
           
 

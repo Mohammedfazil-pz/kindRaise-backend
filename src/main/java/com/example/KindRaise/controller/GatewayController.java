@@ -27,7 +27,7 @@ public class GatewayController {
 @PostMapping("/create")
 public ResponseEntity<?> createOrder(@RequestBody PaymentRequestDto paymentRequestDto) throws Exception {
 
-    Map<String, Object> response = this.razorPayService.createOrder(paymentRequestDto.getAmount());
+    Map<String, Object> response = this.razorPayService.createOrder(paymentRequestDto.getAmount(),paymentRequestDto.getCampaignId());
 
     return ResponseEntity.ok(response);
 }

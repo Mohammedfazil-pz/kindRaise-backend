@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DonationDto {
     private String id;
+    private String title;
     private BigDecimal amount;
     private LocalDate donationDate;
     private String transactionId;

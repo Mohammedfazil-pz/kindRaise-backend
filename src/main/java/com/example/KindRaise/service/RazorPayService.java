@@ -52,7 +52,7 @@ public class RazorPayService {
 
     Map<String,Object> responseObject=new HashMap<>();
 
-    public Map<String,Object> createOrder(BigDecimal amount){
+    public Map<String,Object> createOrder(BigDecimal amount,String campaignId){
 
        try {
          Optional<PaymentGateway> isPaymentGatewayExists=this.paymentGatewayRepository.findByActiveTrue();
@@ -81,6 +81,28 @@ public class RazorPayService {
         responseObject.put("orderId", order.get("id"));
         responseObject.put("amount", order.get("amount"));
         responseObject.put("key", paymentGateway.getApiKey());
+
+         PaymentTransaction paymentTransaction =new PaymentTransaction();
+       
+
+         String username=SecurityContextHolder.getContext().getAuthentication().getName();
+
+         User user= this.userRepository.findByUsername(username);
+
+        Campaign campaign=this.campaignRepository.findById(campaignId).get();
+
+
+         paymentTransaction.setAmount(amount);;
+         paymentTransaction.setTransactionDate(LocalDateTime.now());
+        paymentTransaction.setPaymentReference(order.get("id"));
+         paymentTransaction.setTransactionStatus("PENDING");
+         paymentTransaction.setPaymentMethod("ONLINE");
+         paymentTransaction.setCampaign(campaign);
+         paymentTransaction.setUser(user);
+
+         PaymentTransaction savedPaymentTransaction=this.transactionRepository.save(paymentTransaction);
+
+         responseObject.put("transaction_id", savedPaymentTransaction.getId());
 
          return responseObject;
        } catch (Exception e) {
@@ -119,17 +141,6 @@ public class RazorPayService {
             throw new RuntimeException("Invalid signature");
         }
 
-        PaymentGateway paymentGateway=this.paymentGatewayRepository.findByActiveTrue().get();
-
-        RazorpayClient razorpayClient=new RazorpayClient(paymentGateway.getApiKey(), paymentGateway.getSecretKey());
-
-        Payment payment=razorpayClient.payments.fetch(razorPayResponseDto.getRazorpay_payment_id());
-
-        String method=payment.get("method");
-
-        
-       PaymentTransaction paymentTransaction =new PaymentTransaction();
-
        Optional<Campaign> campaign=this.campaignRepository.findById(razorPayResponseDto.getCampaignID());
 
        
@@ -156,19 +167,24 @@ public class RazorPayService {
             responseObject.put("message", "Sorry, you can't donate. The campaign deadline has expired.");
             responseObject.put("status", false);
             return new ResponseEntity<>(responseObject, HttpStatus.BAD_REQUEST);   
+            
         }
 
-            paymentTransaction.setAmount(razorPayResponseDto.getAmount());
-            paymentTransaction.setPaymentMethod(method);
-            paymentTransaction.setPaymentReference(razorPayResponseDto.getPaymentReference());
-            paymentTransaction.setTransactionDate(LocalDateTime.now());
-            paymentTransaction.setTransactionStatus(razorPayResponseDto.getTransactionStatus());
-            paymentTransaction.setCampaign(campaignDto);
-            paymentTransaction.setUser(user);
+           PaymentGateway paymentGateway=this.paymentGatewayRepository.findByActiveTrue().get();
 
+           RazorpayClient razorpayClient=new RazorpayClient(paymentGateway.getApiKey(), paymentGateway.getSecretKey());
+
+           Payment payment=razorpayClient.payments.fetch(razorPayResponseDto.getRazorpay_payment_id());
+
+            String method=payment.get("method");
+
+           PaymentTransaction paymentTransaction=this.transactionRepository.findById(razorPayResponseDto.getTransactionId()).get();
+
+           paymentTransaction.setTransactionStatus("SUCCESS");
+           paymentTransaction.setPaymentMethod(method);
+           paymentTransaction.setPaymentReference(razorPayResponseDto.getRazorpay_payment_id());
+           this.donationService.donateCampaign(campaignDto,razorPayResponseDto,user);
             this.transactionRepository.save(paymentTransaction);
-
-            this.donationService.donateCampaign(campaignDto,razorPayResponseDto,user);
 
             responseObject.put("message", "You donation is successfully added.");
             responseObject.put("status", true);
@@ -176,31 +192,23 @@ public class RazorPayService {
 
 
     } catch (Exception e) {
-        throw new RuntimeException("Signature verification failed");
+        e.printStackTrace();
+         throw new RuntimeException("Signature verification failed: " + e.getMessage());
     }
 }
 
 
     public void failedPayment(RazorPayResponseDto razorPayResponseDto) {
         try {
-             PaymentTransaction paymentTransaction =new PaymentTransaction();
+          
              Optional<Campaign> campaign=this.campaignRepository.findById(razorPayResponseDto.getCampaignID());
               if(campaign.isEmpty()){
                 throw new RuntimeException("Campaign not found");
             }
 
-             String username=SecurityContextHolder.getContext().getAuthentication().getName();
+            PaymentTransaction paymentTransaction=this.transactionRepository.findById(razorPayResponseDto.getTransactionId()).get();
 
-       
-            User user= this.userRepository.findByUsername(username);
-            Campaign campaignDto=campaign.get();
-
-            paymentTransaction.setAmount(razorPayResponseDto.getAmount());
-            paymentTransaction.setPaymentReference(razorPayResponseDto.getPaymentReference());
-            paymentTransaction.setTransactionDate(LocalDateTime.now());
-            paymentTransaction.setTransactionStatus(razorPayResponseDto.getTransactionStatus());
-            paymentTransaction.setCampaign(campaignDto);
-            paymentTransaction.setUser(user);
+            paymentTransaction.setTransactionStatus("FAILED");
 
             this.transactionRepository.save(paymentTransaction);
 
