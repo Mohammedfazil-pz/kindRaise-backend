@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.KindRaise.dtos.CampaignRequestDto;
 import com.example.KindRaise.model.Campaign;
 import com.example.KindRaise.service.CampaignService;
 
@@ -28,7 +29,7 @@ public class CampaignController {
     
     @PostMapping("/create")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    public ResponseEntity<?> createCampaign(@RequestPart("campaign") Campaign campaign,@RequestPart("file") MultipartFile file){
+    public ResponseEntity<?> createCampaign(@RequestPart("campaign") CampaignRequestDto campaign,@RequestPart("file") MultipartFile file){
         return this.campaignService.createCampaign(campaign,file);
     }
 
@@ -46,7 +47,7 @@ public class CampaignController {
 
     @PutMapping("/update/campaign/{id}")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    public ResponseEntity<?> updateCampaign(@PathVariable("id") String id,@RequestPart("campaign") Campaign campaign,@RequestPart("file") MultipartFile file ){
+    public ResponseEntity<?> updateCampaign(@PathVariable("id") String id,@RequestPart("campaign") CampaignRequestDto campaign,@RequestPart(value = "file", required = false) MultipartFile file ){
         return this.campaignService.updateCampaign(id, campaign, file);
     }
 

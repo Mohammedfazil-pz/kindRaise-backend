@@ -22,6 +22,8 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
         c.description,
         c.goalAmount,
         c.deadline,
+        c.category.id,
+        c.category.title,
         c.status,
         c.user.id
     )
@@ -36,6 +38,8 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
     c.description,
     c.goalAmount,
     c.deadline,
+    c.category.id,
+    c.category.title,
     c.status,
     c.user.id
     )
@@ -50,6 +54,8 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
             c.description,
             c.goalAmount,
             c.deadline,
+            c.category.id,
+            c.category.title,
             c.status,
             c.user.id
             ) FROM Campaign c where c.status='ACTIVE'
@@ -65,6 +71,8 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
             c.description,
             c.goalAmount,
             c.deadline,
+            c.category.id,
+            c.category.title,
             c.status,
             c.user.id
             ) FROM Campaign c

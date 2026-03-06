@@ -16,10 +16,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.KindRaise.dtos.CampaignDto;
 import com.example.KindRaise.dtos.CampaignImageDto;
+import com.example.KindRaise.dtos.CampaignRequestDto;
 import com.example.KindRaise.model.Campaign;
+import com.example.KindRaise.model.Category;
 import com.example.KindRaise.model.Notification;
 import com.example.KindRaise.model.User;
 import com.example.KindRaise.repository.CampaignRepository;
+import com.example.KindRaise.repository.CategoryRepository;
 import com.example.KindRaise.repository.UserRepository;
 
 
@@ -37,11 +40,16 @@ public class CampaignService {
     @Autowired
     NotificationService notificationService;
 
+    @Autowired
+    CategoryRepository categoryRepository;
+
     Map<String,Object> responseObject=new HashMap<>();
 
 
-    public ResponseEntity<?> createCampaign(Campaign campaign, MultipartFile file) {
+    public ResponseEntity<?> createCampaign(CampaignRequestDto campaignRequestDto, MultipartFile file) {
         try {
+            Campaign campaign = new Campaign();
+
              String username = SecurityContextHolder
                 .getContext()
                 .getAuthentication()
@@ -57,9 +65,19 @@ public class CampaignService {
             User userDetails=this.userRepository.findByUsername(username);
             campaign.setUser(userDetails);
 
-            Notification adminNotification=new Notification();
+            Category isCategoryExists= this.categoryRepository.findById(campaignRequestDto.getCategoryId()).get();
+
+            campaign.setTitle(campaignRequestDto.getTitle());
+            campaign.setGoalAmount(campaignRequestDto.getGoalAmount());
+            campaign.setDescription(campaignRequestDto.getDescription());
+            campaign.setDeadline(campaignRequestDto.getDeadline());
+            campaign.setCategory(isCategoryExists);
+
+           
 
             this.campaignRepository.save(campaign);
+
+             Notification adminNotification=new Notification();
 
             // notification for user
             adminNotification.setTitle("New Campaign Request");
@@ -79,7 +97,7 @@ public class CampaignService {
             responseObject.put("message", "Campaign Created wait for the admin approval");
             responseObject.put("status", true);
 
-            return new ResponseEntity<>(responseObject,HttpStatus.CREATED);
+             return new ResponseEntity<>(responseObject,HttpStatus.CREATED);
     
         } catch (Exception e) {
            responseObject.put("message", "Campaign not created "+e.getMessage());
@@ -205,7 +223,7 @@ public class CampaignService {
         }
     }
 
-    public ResponseEntity<?> updateCampaign(String id,Campaign campaign,MultipartFile file){
+    public ResponseEntity<?> updateCampaign(String id,CampaignRequestDto campaign,MultipartFile file){
         try {
 
             Optional<Campaign> isCampaignExists=this.campaignRepository.findById(id);
@@ -221,6 +239,11 @@ public class CampaignService {
             campaignData.setDescription(campaign.getDescription());
             campaignData.setGoalAmount(campaign.getGoalAmount());
             campaignData.setDeadline(campaign.getDeadline());
+
+
+            Category isCategoryExists= this.categoryRepository.findById(campaign.getCategoryId()).get();
+
+            campaignData.setCategory(isCategoryExists);
 
             if(file!=null && !file.isEmpty()){
                 campaignData.setImageData(file.getBytes());

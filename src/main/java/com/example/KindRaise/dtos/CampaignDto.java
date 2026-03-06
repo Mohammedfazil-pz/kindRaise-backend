@@ -18,6 +18,8 @@ public class CampaignDto {
     private String description;
     private BigDecimal goalAmount;
     private LocalDate deadline;
+    private String category_id;
+    private String category_title;
     private String status;
     private String user_id;
 

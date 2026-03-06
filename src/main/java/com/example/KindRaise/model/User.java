@@ -1,7 +1,9 @@
 package com.example.KindRaise.model;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 
@@ -41,5 +43,9 @@ public class User {
     private byte[] imageData;
     private String imageType;
     private String imageName;
+
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
 }
 
