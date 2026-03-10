@@ -3,6 +3,7 @@ package com.example.KindRaise.service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -142,6 +143,29 @@ public class AuthService {
 
              return new ResponseEntity<>(responseObject,HttpStatus.NOT_FOUND);
         }
+    }
+
+    public ResponseEntity<?> onCheckUsername(String username) {
+       try {
+           User isUserExists=this.userRepository.findByUsername(username);
+            if(isUserExists!=null){
+                responseObject.put("message", "Username already exists!");
+                responseObject.put("status", false);
+                return new ResponseEntity<>(responseObject,HttpStatus.CONFLICT);
+            }
+
+            responseObject.put("message", "Username not found ✅");
+            responseObject.put("status", true);
+
+            return new ResponseEntity<>(responseObject,HttpStatus.OK);
+
+
+       } catch (Exception e) {
+            responseObject.put("message", "Username checking failed "+e.getMessage());
+            responseObject.put("status",false);
+
+            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+       }
     }
 
 }
