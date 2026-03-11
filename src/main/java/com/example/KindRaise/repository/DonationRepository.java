@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+
+import com.example.KindRaise.dtos.CampaignTotalDonationDto;
 import com.example.KindRaise.dtos.DonationDto;
 import com.example.KindRaise.dtos.UserDonationDto;
 import com.example.KindRaise.model.Donation;
@@ -34,4 +36,11 @@ public interface DonationRepository extends JpaRepository<Donation,String>{
             ) FROM Donation d 
             """)
     List<DonationDto> findAllDonationsByDto();
+
+    @Query("""
+        SELECT new com.example.KindRaise.dtos.CampaignTotalDonationDto(
+        d.campaign.id,SUM(d.amount)
+        ) FROM Donation d GROUP BY d.campaign.id
+        """)
+    List<CampaignTotalDonationDto> findTotalDonationsOfCampaign();
 }

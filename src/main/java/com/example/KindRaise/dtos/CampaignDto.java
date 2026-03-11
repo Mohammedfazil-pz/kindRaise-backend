@@ -22,6 +22,8 @@ public class CampaignDto {
     private String category_title;
     private String status;
     private String user_id;
+    private BigDecimal amount;
+    
 
     
 }

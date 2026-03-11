@@ -1,10 +1,13 @@
 package com.example.KindRaise.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,12 +20,15 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.KindRaise.dtos.CampaignDto;
 import com.example.KindRaise.dtos.CampaignImageDto;
 import com.example.KindRaise.dtos.CampaignRequestDto;
+import com.example.KindRaise.dtos.CampaignTotalDonationDto;
+import com.example.KindRaise.dtos.DonationDto;
 import com.example.KindRaise.model.Campaign;
 import com.example.KindRaise.model.Category;
 import com.example.KindRaise.model.Notification;
 import com.example.KindRaise.model.User;
 import com.example.KindRaise.repository.CampaignRepository;
 import com.example.KindRaise.repository.CategoryRepository;
+import com.example.KindRaise.repository.DonationRepository;
 import com.example.KindRaise.repository.UserRepository;
 
 
@@ -42,6 +48,9 @@ public class CampaignService {
 
     @Autowired
     CategoryRepository categoryRepository;
+
+    @Autowired
+    DonationRepository donationRepository;
 
     Map<String,Object> responseObject=new HashMap<>();
 
@@ -143,7 +152,19 @@ public class CampaignService {
     public ResponseEntity<?> getActiveCampaigns() {
         try {
             List<CampaignDto> campaigns=this.campaignRepository.findActiveCampaigns();
-            return new ResponseEntity<>(campaigns,HttpStatus.OK);
+            List<CampaignTotalDonationDto> campaignTotalDonationDtos=this.donationRepository.findTotalDonationsOfCampaign();
+
+            Map<String,BigDecimal> donationMap=campaignTotalDonationDtos.
+            stream()
+            .collect(Collectors.toMap(each->each.getCampaign_id(), each->each.getAmount()));
+
+            List<CampaignDto> campaignWithAmount=campaigns.stream().map((each)->{
+                BigDecimal totalAmount=donationMap.getOrDefault(each.getId(), BigDecimal.ZERO);
+                each.setAmount(totalAmount);
+                return each;
+            }).toList();
+            
+            return new ResponseEntity<>(campaignWithAmount,HttpStatus.OK);
         } catch (Exception e) {
              responseObject.put("message", "Error on fetching campaigns "+e.getMessage());
              responseObject.put("status", false);

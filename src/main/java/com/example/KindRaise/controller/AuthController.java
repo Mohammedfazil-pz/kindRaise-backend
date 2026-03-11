@@ -37,7 +37,7 @@ public class AuthController {
 
     @PostMapping("/checkusername/{username}")
     public ResponseEntity<?> onCheckUsername(@PathVariable("username") String username){
-        System.out.println(username);
+       
         return this.authService.onCheckUsername(username);
     }
 

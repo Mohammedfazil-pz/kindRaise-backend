@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -40,6 +40,7 @@ public class User {
     private String fullName;
     private LocalDate DOB;
     @Lob
+    @JsonIgnore
     private byte[] imageData;
     private String imageType;
     private String imageName;

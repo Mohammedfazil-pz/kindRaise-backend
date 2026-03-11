@@ -25,7 +25,8 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
         c.category.id,
         c.category.title,
         c.status,
-        c.user.id
+        c.user.id,
+         java.math.BigDecimal.ZERO
     )
     FROM Campaign c
     WHERE c.user.id = :userId
@@ -41,7 +42,8 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
     c.category.id,
     c.category.title,
     c.status,
-    c.user.id
+    c.user.id,
+     java.math.BigDecimal.ZERO
     )
     FROM Campaign c WHERE c.id = :id
     """)
@@ -57,7 +59,8 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
             c.category.id,
             c.category.title,
             c.status,
-            c.user.id
+            c.user.id,
+             java.math.BigDecimal.ZERO
             ) FROM Campaign c where c.status='ACTIVE'
             """)
     List<CampaignDto> findActiveCampaigns(); 
@@ -74,7 +77,8 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
             c.category.id,
             c.category.title,
             c.status,
-            c.user.id
+            c.user.id,
+             java.math.BigDecimal.ZERO
             ) FROM Campaign c
             """)
     List<CampaignDto> findAllCampaignsWithDto();

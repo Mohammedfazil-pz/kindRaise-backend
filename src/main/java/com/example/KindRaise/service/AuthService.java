@@ -9,9 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +22,8 @@ import com.example.KindRaise.jwt.JwtUtils;
 import com.example.KindRaise.model.Notification;
 import com.example.KindRaise.model.User;
 import com.example.KindRaise.repository.UserRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class AuthService {
@@ -42,8 +46,6 @@ public class AuthService {
 
     public ResponseEntity<?> registerUser(User user,MultipartFile file){
         Notification adminNotification=new Notification();
-     
-
         try {
            User isAlreadyExistsUsername=this.userRepository.findByUsername(user.getUsername());
            if(isAlreadyExistsUsername!=null){
@@ -65,12 +67,14 @@ public class AuthService {
            user.setImageName(file.getOriginalFilename());
            user.setImageType(file.getContentType());
 
+           
+
            this.userRepository.save(user);
 
           adminNotification.setTitle("New Account Registration");
           adminNotification.setMessage("A new user with username : "+user.getUsername() +" has been successfully created an account");
 
-            responseObject.put("message", "User Created SuccessFully");
+            responseObject.put("message", "Your account has been registered successfully.");
             responseObject.put("status",true);
             responseObject.put("role", user.getRole());
             responseObject.put("username", user.getUsername());
@@ -120,28 +124,52 @@ public class AuthService {
 
     }
 
+    @Transactional
     public ResponseEntity<?> loginUser(User user) {
         
         try {
+             User existingUser = userRepository.findByUsername(user.getUsername());
+
+            if(existingUser == null){
+                responseObject.put("message","User not found. Please register first.");
+                responseObject.put("status",false);
+                return new ResponseEntity<>(responseObject,HttpStatus.NOT_FOUND);
+         }
             Authentication authentication=this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
 
             String access_token=this.jwtUtils.generateTokenWithUsername(user.getUsername());
 
-            responseObject.put("message","Login Sucess!");
+            responseObject.put("message","Login successful! Redirecting to your dashboard...");
             responseObject.put("status",true);
             responseObject.put("access_token", access_token);
+            responseObject.put("role", authentication.getAuthorities());
+            responseObject.put("name", existingUser.getFullName());
           
-
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             return new ResponseEntity<>(responseObject,HttpStatus.OK);
 
-        } catch (Exception e) {
-            responseObject.put("message", "Login Failed "+e.getMessage());
-            responseObject.put("status",false);
+        } catch (BadCredentialsException e) {
 
-             return new ResponseEntity<>(responseObject,HttpStatus.NOT_FOUND);
+            responseObject.put("message", "Invalid username or password.");
+            responseObject.put("status", false);
+
+            return new ResponseEntity<>(responseObject, HttpStatus.UNAUTHORIZED);
+        } 
+        catch (UsernameNotFoundException e) {
+
+            responseObject.put("message", "User not found. Please register first.");
+            responseObject.put("status", false);
+
+            return new ResponseEntity<>(responseObject, HttpStatus.NOT_FOUND);
+        } 
+        catch (Exception e) {
+
+            responseObject.put("message", "Login failed: " + e.getMessage());
+            responseObject.put("status", false);
+
+            return new ResponseEntity<>(responseObject, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -149,7 +177,7 @@ public class AuthService {
        try {
            User isUserExists=this.userRepository.findByUsername(username);
             if(isUserExists!=null){
-                responseObject.put("message", "Username already exists!");
+                responseObject.put("message", "This username is already taken.");
                 responseObject.put("status", false);
                 return new ResponseEntity<>(responseObject,HttpStatus.CONFLICT);
             }
