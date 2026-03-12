@@ -17,7 +17,7 @@ public class CustomizedUserDetailsService implements UserDetailsService{
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        com.example.KindRaise.model.User user= this.userRepository.findByUsername(username);
+        com.example.KindRaise.model.User user= this.userRepository.findUserWithoutImage(username);
         if(user!=null){
             return User.builder().username(user.getUsername()).password(user.getPassword()).roles(user.getRole()).build();
         }

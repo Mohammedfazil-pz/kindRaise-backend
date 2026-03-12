@@ -43,9 +43,17 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
     c.category.title,
     c.status,
     c.user.id,
-     java.math.BigDecimal.ZERO
+COALESCE(SUM(d.amount),0)
     )
-    FROM Campaign c WHERE c.id = :id
+    FROM Campaign c LEFT JOIN Donation d ON c.id=d.campaign.id WHERE c.id = :id GROUP BY c.id,
+    c.title,
+    c.description,
+    c.goalAmount,
+    c.deadline,
+    c.category.id,
+    c.category.title,
+    c.status,
+    c.user.id
     """)
     Optional<CampaignDto> findCampaignDtoById(@Param("id") String id);
 
@@ -61,9 +69,11 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
             c.status,
             c.user.id,
              java.math.BigDecimal.ZERO
-            ) FROM Campaign c where c.status='ACTIVE'
+            ) FROM Campaign c WHERE c.status='ACTIVE' AND(
+            COALESCE(:search,'') = '' OR c.title LIKE CONCAT('%',:search,'%') OR c.description LIKE CONCAT('%',:search,'%') 
+            ) AND( :category IS NULL OR c.category.id=:category)
             """)
-    List<CampaignDto> findActiveCampaigns(); 
+    List<CampaignDto> findActiveCampaigns(@Param("search") String search,@Param("category") String category); 
     
     // For each row in Campaign table, create a new CampaignDto object using this constructor.
     @Query("""

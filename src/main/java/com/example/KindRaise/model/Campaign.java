@@ -9,8 +9,10 @@ import org.hibernate.annotations.UuidGenerator;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -40,6 +42,7 @@ public class Campaign {
     private String status;
     @JsonIgnore
     @Lob
+    @Basic(fetch = FetchType.LAZY)
     private byte[] imageData;
     private String imageName;
     private String imageType;

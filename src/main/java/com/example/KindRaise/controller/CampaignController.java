@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,6 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.KindRaise.dtos.CampaignRequestDto;
 import com.example.KindRaise.model.Campaign;
 import com.example.KindRaise.service.CampaignService;
+
+import jakarta.websocket.server.PathParam;
 
 @CrossOrigin
 @RestController
@@ -40,7 +42,7 @@ public class CampaignController {
     }
     
     @GetMapping("/user/campaign/{id}")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<?> getSingleCampaignById(@PathVariable("id") String id){
         return this.campaignService.getSingleCampaignById(id);
     }
@@ -59,8 +61,9 @@ public class CampaignController {
 
 
     @GetMapping("/active/campaigns")
-    public ResponseEntity<?> getActiveCampaigns(){
-        return this.campaignService.getActiveCampaigns();
+    public ResponseEntity<?> getActiveCampaigns(@RequestParam(value = "search", required = false) String searchQuery,@RequestParam(value = "category", required = false) String category){
+        
+        return this.campaignService.getActiveCampaigns(searchQuery,category);
     }
 
     

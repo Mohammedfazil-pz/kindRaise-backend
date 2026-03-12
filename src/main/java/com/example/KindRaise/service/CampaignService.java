@@ -124,7 +124,6 @@ public class CampaignService {
             System.out.println("Username"+username);
             User userDetails=this.userRepository.findByUsername(username);
             List<CampaignDto> userCampaigns=this.campaignRepository.findUserCampaigns(userDetails.getId());
-            // List<CampaignDto> filteredCampaign=userCampaigns.stream().map(each->new CampaignDto(each)).toList();
             return new ResponseEntity<>(userCampaigns,HttpStatus.OK);
         } catch (Exception e) {
              responseObject.put("message", "Error on fetching campaigns "+e.getMessage());
@@ -149,9 +148,11 @@ public class CampaignService {
     }
 
 
-    public ResponseEntity<?> getActiveCampaigns() {
+    public ResponseEntity<?> getActiveCampaigns(String searchQuery,String category) {
+      
+
         try {
-            List<CampaignDto> campaigns=this.campaignRepository.findActiveCampaigns();
+            List<CampaignDto> campaigns=this.campaignRepository.findActiveCampaigns(searchQuery,category);
             List<CampaignTotalDonationDto> campaignTotalDonationDtos=this.donationRepository.findTotalDonationsOfCampaign();
 
             Map<String,BigDecimal> donationMap=campaignTotalDonationDtos.
