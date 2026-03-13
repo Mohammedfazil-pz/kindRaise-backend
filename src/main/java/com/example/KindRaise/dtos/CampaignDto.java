@@ -23,6 +23,7 @@ public class CampaignDto {
     private String status;
     private String user_id;
     private BigDecimal amount;
+    private Long totalDonors;
     
 
     

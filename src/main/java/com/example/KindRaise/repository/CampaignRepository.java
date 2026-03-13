@@ -26,7 +26,8 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
         c.category.title,
         c.status,
         c.user.id,
-         java.math.BigDecimal.ZERO
+         java.math.BigDecimal.ZERO,
+         0L
     )
     FROM Campaign c
     WHERE c.user.id = :userId
@@ -43,7 +44,8 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
     c.category.title,
     c.status,
     c.user.id,
-COALESCE(SUM(d.amount),0)
+    COALESCE(SUM(d.amount),0),
+    COUNT(DISTINCT d.user.id)
     )
     FROM Campaign c LEFT JOIN Donation d ON c.id=d.campaign.id WHERE c.id = :id GROUP BY c.id,
     c.title,
@@ -68,7 +70,8 @@ COALESCE(SUM(d.amount),0)
             c.category.title,
             c.status,
             c.user.id,
-             java.math.BigDecimal.ZERO
+             java.math.BigDecimal.ZERO,
+             0L
             ) FROM Campaign c WHERE c.status='ACTIVE' AND(
             COALESCE(:search,'') = '' OR c.title LIKE CONCAT('%',:search,'%') OR c.description LIKE CONCAT('%',:search,'%') 
             ) AND( :category IS NULL OR c.category.id=:category)
@@ -88,7 +91,8 @@ COALESCE(SUM(d.amount),0)
             c.category.title,
             c.status,
             c.user.id,
-             java.math.BigDecimal.ZERO
+             java.math.BigDecimal.ZERO,
+             0L
             ) FROM Campaign c
             """)
     List<CampaignDto> findAllCampaignsWithDto();
