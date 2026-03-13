@@ -62,7 +62,7 @@ public class UserService {
             String username=SecurityContextHolder.getContext().getAuthentication().getName();
 
             if(username.isEmpty()){
-                responseObject.put("message", "Please login to fecth profile data");
+                responseObject.put("message", "Please login to fetch profile data");
                 responseObject.put("status", false);
                 return new ResponseEntity<>(responseObject,HttpStatus.UNAUTHORIZED);
             }
@@ -70,6 +70,22 @@ public class UserService {
             UserProfileImageDto user=this.userRepository.findUserProfileImageWithDto(id);
 
             return ResponseEntity.ok().contentType(MediaType.parseMediaType(user.getImageType())).body(user.getImageData());
+
+        } catch (Exception e) {
+           responseObject.put("message", "Something went wrong"+e.getMessage());
+           responseObject.put("status", false);
+
+           return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+
+        }
+    }
+
+    public ResponseEntity<?> fetchProfileById(String id) {
+       Map<String,Object> responseObject=new HashMap<>();
+
+        try {
+            User user=this.userRepository.findUserByIdWithoutImage(id);
+            return new ResponseEntity<>(user,HttpStatus.OK);
 
         } catch (Exception e) {
            responseObject.put("message", "Something went wrong"+e.getMessage());

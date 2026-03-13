@@ -1,6 +1,5 @@
 package com.example.KindRaise.repository;
 
-import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -35,6 +34,27 @@ public interface UserRepository extends JpaRepository<User,String>  {
         WHERE u.username = :username
         """)
      User findUserWithoutImage(@Param("username") String username);
+
+
+
+     @Query("""
+        SELECT new com.example.KindRaise.model.User(
+        u.id,
+        u.username,
+        u.password,
+        u.role,
+        u.phone,
+        u.fullName,
+        u.DOB,
+        null,
+        null,
+        null,
+        u.createdAt
+        )
+        FROM User u
+        WHERE u.id = :id
+        """)
+     User findUserByIdWithoutImage(@Param("id") String id);
 
 
      @Query("""

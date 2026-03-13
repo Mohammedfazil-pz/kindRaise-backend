@@ -87,7 +87,7 @@ public class RazorPayService {
 
          String username=SecurityContextHolder.getContext().getAuthentication().getName();
 
-         User user= this.userRepository.findByUsername(username);
+         User user= this.userRepository.findUserWithoutImage(username);
 
         Campaign campaign=this.campaignRepository.findById(campaignId).get();
 
@@ -153,7 +153,7 @@ public class RazorPayService {
        String username=SecurityContextHolder.getContext().getAuthentication().getName();
 
        
-       User user= this.userRepository.findByUsername(username);
+       User user= this.userRepository.findUserWithoutImage(username);
        Campaign campaignDto=campaign.get();
 
        if(!campaignDto.getStatus().equals("ACTIVE")){
@@ -184,7 +184,7 @@ public class RazorPayService {
            paymentTransaction.setPaymentMethod(method);
            paymentTransaction.setPaymentReference(razorPayResponseDto.getRazorpay_payment_id());
            this.donationService.donateCampaign(campaignDto,razorPayResponseDto,user);
-            this.transactionRepository.save(paymentTransaction);
+        this.transactionRepository.save(paymentTransaction);
 
             responseObject.put("message", "You donation is successfully added.");
             responseObject.put("status", true);

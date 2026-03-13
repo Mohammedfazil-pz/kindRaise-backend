@@ -1,7 +1,7 @@
 package com.example.KindRaise.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +25,11 @@ public class UserController {
     @GetMapping("/profile/image/{id}")
     public ResponseEntity<?> fetchProfileImage(@PathVariable String id){
        return this.userService.fetchProfileImage(id);
+    }
+
+    @GetMapping("/profile/{id}")
+    public ResponseEntity<?> fetchProfileById(@PathVariable String id){
+        return this.userService.fetchProfileById(id);
     }
 
 

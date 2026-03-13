@@ -3,7 +3,7 @@ package com.example.KindRaise.service;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -71,8 +71,8 @@ public class AuthService {
 
            this.userRepository.save(user);
 
-          adminNotification.setTitle("New Account Registration");
-          adminNotification.setMessage("A new user with username : "+user.getUsername() +" has been successfully created an account");
+            adminNotification.setTitle("New Account Registration");
+            adminNotification.setMessage("A new user with username : "+user.getUsername() +" has been successfully created an account");
 
             responseObject.put("message", "Your account has been registered successfully.");
             responseObject.put("status",true);

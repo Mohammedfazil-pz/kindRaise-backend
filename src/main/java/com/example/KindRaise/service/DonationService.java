@@ -58,7 +58,10 @@ public class DonationService {
 
         Donation donation = new Donation();
 
-        User campaignOwner=this.userRepository.findById(campaignDto.getUser().getId()).get();
+        System.out.println(razorPayResponseDto);
+        System.out.println(user);
+
+        User campaignOwner=this.userRepository.findUserByIdWithoutImage(campaignDto.getUser().getId());
 
         donation.setAmount(razorPayResponseDto.getAmount());
         donation.setCampaign(campaignDto);

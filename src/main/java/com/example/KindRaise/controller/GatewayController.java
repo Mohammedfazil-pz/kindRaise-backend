@@ -24,26 +24,22 @@ public class GatewayController {
     @Autowired
     RazorPayService razorPayService;
 
-@PostMapping("/create")
-public ResponseEntity<?> createOrder(@RequestBody PaymentRequestDto paymentRequestDto) throws Exception {
+    @PostMapping("/create")
+    public ResponseEntity<?> createOrder(@RequestBody PaymentRequestDto paymentRequestDto) throws Exception {
+        Map<String, Object> response = this.razorPayService.createOrder(paymentRequestDto.getAmount(),
+        paymentRequestDto.getCampaignId());
+        return ResponseEntity.ok(response);
+    }
 
-    Map<String, Object> response = this.razorPayService.createOrder(paymentRequestDto.getAmount(),paymentRequestDto.getCampaignId());
+    @PostMapping("/verify")
+    public ResponseEntity<?> verifyPayment(@RequestBody RazorPayResponseDto razorPayResponseDto) {
+        return this.razorPayService.verifySignature(razorPayResponseDto);
+    }
 
-    return ResponseEntity.ok(response);
-}
-
-@PostMapping("/verify")
-public ResponseEntity<?> verifyPayment(@RequestBody RazorPayResponseDto razorPayResponseDto) {
-
- return this.razorPayService.verifySignature(razorPayResponseDto);
-
-   
-}
-
-@PostMapping("/payment-failed")
-public void failedPayment(@RequestBody RazorPayResponseDto razorPayResponseDto) {
-   this.razorPayService.failedPayment(razorPayResponseDto);
-}
+    @PostMapping("/payment-failed")
+    public void failedPayment(@RequestBody RazorPayResponseDto razorPayResponseDto) {
+    this.razorPayService.failedPayment(razorPayResponseDto);
+    }
 
   
 }

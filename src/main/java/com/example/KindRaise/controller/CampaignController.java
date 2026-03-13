@@ -16,10 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.KindRaise.dtos.CampaignRequestDto;
-import com.example.KindRaise.model.Campaign;
+
 import com.example.KindRaise.service.CampaignService;
 
-import jakarta.websocket.server.PathParam;
+
 
 @CrossOrigin
 @RestController
