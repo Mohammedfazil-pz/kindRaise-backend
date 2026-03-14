@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import com.example.KindRaise.dtos.CampaignTotalDonationDto;
 import com.example.KindRaise.dtos.DonationDto;
+import com.example.KindRaise.dtos.DonationUserStatsDto;
 import com.example.KindRaise.dtos.UserDonationDto;
 import com.example.KindRaise.model.Donation;
 
@@ -25,8 +26,11 @@ public interface DonationRepository extends JpaRepository<Donation,String>{
 
      @Query("""
             SELECT new com.example.KindRaise.dtos.UserDonationDto(
-            d.id,d.amount,d.donationDate,d.transactionId,d.campaign.title,d.campaign.id
-            ) FROM Donation d WHERE d.user.id=:id
+           d.campaign.title,d.campaign.description,COALESCE(SUM(d.amount),0),
+           (SELECT SUM(d2.amount) FROM Donation d2 WHERE d2.campaign.id=d.campaign.id),
+           d.campaign.goalAmount,d.campaign.id
+            ) FROM Donation d  WHERE d.user.id=:id GROUP BY 
+             d.campaign.title,d.campaign.id,d.campaign.description,d.campaign.goalAmount
             """)
     List<UserDonationDto> findDonationByUserId(@Param("id") String id);
 
@@ -43,4 +47,15 @@ public interface DonationRepository extends JpaRepository<Donation,String>{
         ) FROM Donation d GROUP BY d.campaign.id
         """)
     List<CampaignTotalDonationDto> findTotalDonationsOfCampaign();
+
+    
+    @Query("""
+        SELECT new com.example.KindRaise.dtos.DonationUserStatsDto(
+        COALESCE(SUM(d.amount),0),COUNT(d),COUNT(DISTINCT d.campaign.id)
+        ) FROM Donation d WHERE d.user.id=:id 
+        """)
+    DonationUserStatsDto findDonationUserStatsDto(@Param("id") String userId);    
+
+
+    
 }

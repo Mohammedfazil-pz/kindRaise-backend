@@ -11,10 +11,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDonationDto {
-    private String id;
-    private BigDecimal amount;
-    private LocalDate donationDate;
-    private String transactionId;
     private String title;
+    private String description;
+    private BigDecimal amount; 
+    private BigDecimal totalAmount;
+    private BigDecimal goalAmount;
     private String campaign_id;
+   
 }

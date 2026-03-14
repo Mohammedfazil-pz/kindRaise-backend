@@ -40,4 +40,9 @@ public class DonationController {
     public ResponseEntity<?> getAllDonations(){
         return this.donationService.getAllDonations();
     }
+
+    @GetMapping("/dashboard/user/stats")
+    public ResponseEntity<?> getDashboardStats(){
+        return this.donationService.getDashboardStats();
+    }
 }

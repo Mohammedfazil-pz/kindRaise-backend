@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 
 import com.example.KindRaise.dtos.DonationDto;
+import com.example.KindRaise.dtos.DonationUserStatsDto;
 import com.example.KindRaise.dtos.RazorPayResponseDto;
 import com.example.KindRaise.dtos.UserDonationDto;
 import com.example.KindRaise.model.Campaign;
@@ -134,7 +135,7 @@ public class DonationService {
         try {
 
             String username=SecurityContextHolder.getContext().getAuthentication().getName();
-            User userDetails=this.userRepository.findByUsername(username);
+            User userDetails=this.userRepository.findUserWithoutImage(username);
             List<UserDonationDto> donations=this.donationRepository.findDonationByUserId(userDetails.getId());
             return new ResponseEntity<>(donations,HttpStatus.OK);
         } catch (Exception e) {
@@ -155,5 +156,35 @@ public class DonationService {
             return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    public ResponseEntity<?> getUserDonationDashboardStats(){
+        try {
+            return new ResponseEntity<>("1",HttpStatus.OK);
+        } catch (Exception e) {
+            responseObject.put("message", "Failed to fetch All donations "+e.getMessage());
+            responseObject.put("status", false);
+
+            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    public ResponseEntity<?> getDashboardStats() {
+        Map<String,Object> responseObject=new HashMap<>();
+        try {
+
+            String username=SecurityContextHolder.getContext().getAuthentication().getName();
+            User user=this.userRepository.findUserWithoutImage(username);
+            DonationUserStatsDto donationUserStatsDto=this.donationRepository.findDonationUserStatsDto(user.getId());
+
+            return new ResponseEntity<>(donationUserStatsDto,HttpStatus.OK);
+            
+        } catch (Exception e) {
+            responseObject.put("message", "Something went wrong while fetching donations "+e.getMessage());
+            responseObject.put("status", false);
+
+            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    
 
 }
