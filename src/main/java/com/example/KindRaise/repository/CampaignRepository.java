@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.example.KindRaise.dtos.CampaignDashboardDto;
 import com.example.KindRaise.dtos.CampaignDto;
 import com.example.KindRaise.dtos.CampaignImageDto;
 import com.example.KindRaise.model.Campaign;
@@ -100,5 +101,13 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
             SELECT new com.example.KindRaise.dtos.CampaignImageDto(c.imageData,c.imageType) FROM Campaign c WHERE c.id=:id
             """)
     Optional<CampaignImageDto> getCampaignImage(@Param("id") String id);
+
+
+    @Query("""
+             SELECT new com.example.KindRaise.dtos.CampaignDashboardDto(
+             COUNT(DISTINCT c.id),COALESCE(SUM(d.amount),0l) ) FROM Campaign c
+             LEFT JOIN Donation d ON d.campaign.id=c.id WHERE c.user.id =:userId
+                 """)
+    CampaignDashboardDto fetchUserCampaignDashboardDetails(@Param("userId") String userId);          
 
 }

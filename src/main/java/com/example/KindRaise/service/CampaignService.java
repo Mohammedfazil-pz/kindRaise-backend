@@ -17,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.KindRaise.dtos.CampaignDashboardDto;
 import com.example.KindRaise.dtos.CampaignDto;
 import com.example.KindRaise.dtos.CampaignImageDto;
 import com.example.KindRaise.dtos.CampaignRequestDto;
@@ -52,10 +53,11 @@ public class CampaignService {
     @Autowired
     DonationRepository donationRepository;
 
-    Map<String,Object> responseObject=new HashMap<>();
-
+    
 
     public ResponseEntity<?> createCampaign(CampaignRequestDto campaignRequestDto, MultipartFile file) {
+        Map<String,Object> responseObject=new HashMap<>();
+
         try {
             Campaign campaign = new Campaign();
 
@@ -71,7 +73,7 @@ public class CampaignService {
 
             campaign.setStatus("PENDING");
 
-            User userDetails=this.userRepository.findByUsername(username);
+            User userDetails=this.userRepository.findUserWithoutImage(username);
             campaign.setUser(userDetails);
 
             Category isCategoryExists= this.categoryRepository.findById(campaignRequestDto.getCategoryId()).get();
@@ -119,10 +121,12 @@ public class CampaignService {
 
    
     public ResponseEntity<?> getUserCampaigns() {
+        Map<String,Object> responseObject=new HashMap<>();
+
         try {
             String username=SecurityContextHolder.getContext().getAuthentication().getName();
             System.out.println("Username"+username);
-            User userDetails=this.userRepository.findByUsername(username);
+            User userDetails=this.userRepository.findUserWithoutImage(username);
             List<CampaignDto> userCampaigns=this.campaignRepository.findUserCampaigns(userDetails.getId());
             return new ResponseEntity<>(userCampaigns,HttpStatus.OK);
         } catch (Exception e) {
@@ -135,6 +139,7 @@ public class CampaignService {
 
   
     public ResponseEntity<?> getSingleCampaignById(String id) {
+        Map<String,Object> responseObject=new HashMap<>();
         try {
 
             CampaignDto campaign=this.campaignRepository.findCampaignDtoById(id).orElse(new CampaignDto());
@@ -149,8 +154,7 @@ public class CampaignService {
 
 
     public ResponseEntity<?> getActiveCampaigns(String searchQuery,String category) {
-      
-
+        Map<String,Object> responseObject=new HashMap<>();
         try {
             List<CampaignDto> campaigns=this.campaignRepository.findActiveCampaigns(searchQuery,category);
             List<CampaignTotalDonationDto> campaignTotalDonationDtos=this.donationRepository.findTotalDonationsOfCampaign();
@@ -176,6 +180,7 @@ public class CampaignService {
 
 
     public ResponseEntity<?> getAllCampaigns() {
+        Map<String,Object> responseObject=new HashMap<>();
         try {
             List<CampaignDto> allCampaignDtos=this.campaignRepository.findAllCampaignsWithDto();
             return new ResponseEntity<>(allCampaignDtos,HttpStatus.OK);
@@ -189,6 +194,7 @@ public class CampaignService {
 
 
     public ResponseEntity<?> updateStatusCampaign(String campaignId, String status) {
+        Map<String,Object> responseObject=new HashMap<>();
         try {
             Optional<Campaign> checkingCampaign=this.campaignRepository.findById(campaignId);
             if(checkingCampaign.isEmpty()){
@@ -225,6 +231,7 @@ public class CampaignService {
     }
     @Transactional
     public ResponseEntity<?> getCampaignImage(String id) {
+        Map<String,Object> responseObject=new HashMap<>();
         try {
             Optional<CampaignImageDto> imageChecking=this.campaignRepository.getCampaignImage(id);
             if(imageChecking.isEmpty()){
@@ -246,6 +253,7 @@ public class CampaignService {
     }
 
     public ResponseEntity<?> updateCampaign(String id,CampaignRequestDto campaign,MultipartFile file){
+        Map<String,Object> responseObject=new HashMap<>();
         try {
 
             Optional<Campaign> isCampaignExists=this.campaignRepository.findById(id);
@@ -289,6 +297,7 @@ public class CampaignService {
     }
 
     public ResponseEntity<?> deleteCampaign(String id){
+        Map<String,Object> responseObject=new HashMap<>();
         try {
             this.campaignRepository.deleteById(id);
              responseObject.put("message", "Campaign Removed successfully!");
@@ -297,6 +306,23 @@ public class CampaignService {
             return new ResponseEntity<>(responseObject, HttpStatus.OK);
         } catch (Exception e) {
             responseObject.put("message", "Failed to Delete campaign "+e.getMessage());
+            responseObject.put("status", false);
+
+            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<?> userCampaignDashboard(){
+        Map<String,Object> responseObject=new HashMap<>();
+        try {
+
+            String username=SecurityContextHolder.getContext().getAuthentication().getName();
+            User user=this.userRepository.findUserWithoutImage(username);
+            CampaignDashboardDto campaignDashboardDto= this.campaignRepository.fetchUserCampaignDashboardDetails(user.getId());
+            return new ResponseEntity<>(campaignDashboardDto, HttpStatus.OK);
+            
+        } catch (Exception e) {
+            responseObject.put("message", "Failed to fetch campaign Dashboard "+e.getMessage());
             responseObject.put("status", false);
 
             return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);

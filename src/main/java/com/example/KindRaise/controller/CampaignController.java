@@ -84,6 +84,11 @@ public class CampaignController {
         return this.campaignService.getCampaignImage(id);
     }
 
+    @GetMapping("/dashboard/user")
+    public ResponseEntity<?> userCampaignDashboard(){
+        return this.campaignService.userCampaignDashboard();
+    }
+
    
 
     

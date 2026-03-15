@@ -33,7 +33,7 @@ public class Campaign {
     private String id;
     @Column(nullable = false)
     private String title;
-     @Column(nullable = false)
+     @Column(nullable = false,columnDefinition = "TEXT")
     private String description;
      @Column(nullable = false)
     private BigDecimal goalAmount;
