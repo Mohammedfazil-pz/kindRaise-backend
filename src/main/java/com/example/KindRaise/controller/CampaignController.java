@@ -74,7 +74,7 @@ public class CampaignController {
     }
 
     @PutMapping("/update/campaign/status/{campaignID}/{status}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     public ResponseEntity<?> updateStatusCampaign(@PathVariable("campaignID") String campaignId,@PathVariable("status") String status){
         return this.campaignService.updateStatusCampaign(campaignId,status);
     }

@@ -27,11 +27,20 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
         c.category.title,
         c.status,
         c.user.id,
-         java.math.BigDecimal.ZERO,
-         0L
+        COALESCE(SUM(d.amount),0),
+        COUNT(DISTINCT d.user.id)
     )
-    FROM Campaign c
-    WHERE c.user.id = :userId
+    FROM Campaign c LEFT JOIN Donation d ON c.id=d.campaign.id WHERE c.user.id = :userId
+    GROUP BY c.id, c.title,
+    c.description,
+    c.goalAmount,
+    c.deadline,
+    c.category.id,
+    c.category.title,
+    c.status,
+    c.user.id ORDER BY 
+    CASE WHEN c.status = 'ACTIVE' THEN 0 ELSE 1 END,
+    c.createdAt DESC
     """)
     List<CampaignDto> findUserCampaigns(@Param("userId") String userId);
   @Query("""
@@ -105,7 +114,9 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
 
     @Query("""
              SELECT new com.example.KindRaise.dtos.CampaignDashboardDto(
-             COUNT(DISTINCT c.id),COALESCE(SUM(d.amount),0l) ) FROM Campaign c
+             COUNT(DISTINCT c.id),COALESCE(SUM(d.amount),0l), COUNT(DISTINCT CASE 
+    WHEN c.status='ACTIVE' THEN c.id 
+END) ) FROM Campaign c
              LEFT JOIN Donation d ON d.campaign.id=c.id WHERE c.user.id =:userId
                  """)
     CampaignDashboardDto fetchUserCampaignDashboardDetails(@Param("userId") String userId);          

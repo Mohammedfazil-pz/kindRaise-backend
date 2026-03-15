@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class CampaignDashboardDto {
     private Long totalCampaigns;
     private BigDecimal totalAmount;
+    private Long activeCampaigns;
 }
