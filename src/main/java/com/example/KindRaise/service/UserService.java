@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.KindRaise.dtos.UserProfileImageDto;
 import com.example.KindRaise.model.Notification;
 import com.example.KindRaise.model.User;
+import com.example.KindRaise.repository.DonationRepository;
 import com.example.KindRaise.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
@@ -32,6 +33,9 @@ public class UserService {
 
     @Autowired
     NotificationService notificationService;
+
+    @Autowired
+    DonationRepository donationRepository;
 
 
     public ResponseEntity<?> fetchProfile(){
@@ -213,12 +217,14 @@ public class UserService {
             return new ResponseEntity<>(responseObject,HttpStatus.OK);
             
         } catch (Exception e) {
-            responseObject.put("message", "Something went wrong While checking password"+e.getMessage());
+           responseObject.put("message", "Something went wrong While checking password"+e.getMessage());
            responseObject.put("status", false);
 
            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    
 
 
 

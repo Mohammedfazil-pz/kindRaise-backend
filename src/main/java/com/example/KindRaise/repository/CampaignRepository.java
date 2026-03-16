@@ -119,6 +119,9 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
 END) ) FROM Campaign c
              LEFT JOIN Donation d ON d.campaign.id=c.id WHERE c.user.id =:userId
                  """)
-    CampaignDashboardDto fetchUserCampaignDashboardDetails(@Param("userId") String userId);          
+    CampaignDashboardDto fetchUserCampaignDashboardDetails(@Param("userId") String userId);   
+    
+    
+    Long countByUserIdAndStatusIs(String userId,String status);
 
 }

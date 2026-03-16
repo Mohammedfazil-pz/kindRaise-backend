@@ -56,6 +56,15 @@ public interface DonationRepository extends JpaRepository<Donation,String>{
         """)
     DonationUserStatsDto findDonationUserStatsDto(@Param("id") String userId);    
 
+    Long countByUserId(String donorId);   
+    
+    @Query("""
+            SELECT new com.example.KindRaise.dtos.DonationDto(
+            d.id,d.campaign.title,d.amount,d.donationDate,d.transactionId,d.user.id,null
+            ) FROM Donation d WHERE d.user.id=:id ORDER BY d.donationDate DESC LIMIT 1
+            """)
+    DonationDto findTopByUserIdOrderByDonationDateDesc(@Param("id")String donorId);
+
 
     
 }
