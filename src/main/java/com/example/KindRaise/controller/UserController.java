@@ -5,9 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.example.KindRaise.model.User;
 import com.example.KindRaise.service.UserService;
 
 @RestController
@@ -32,6 +37,23 @@ public class UserController {
         return this.userService.fetchProfileById(id);
     }
 
+    @PutMapping("/update/profile/{id}")
+    public ResponseEntity<?> updateProfile(
+        @PathVariable String id,
+        @RequestPart("info") User user,
+        @RequestPart(value = "file",required = false) MultipartFile file){
+            return this.userService.updateProfile(id, user, file);
+        }
+
+    @PostMapping("/check/password/{id}/{password}")
+    public ResponseEntity<?> checkPassword(@PathVariable String id,@PathVariable String password){
+        return this.userService.checkPassword(id, password);
+    }  
+    
+    @PutMapping("/change/password/{id}/{password}")
+    public ResponseEntity<?> setNewPassword(@PathVariable String id,@PathVariable String password){
+        return this.userService.setNewPassword(id, password);
+    }  
 
 
 }

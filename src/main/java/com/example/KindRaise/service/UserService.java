@@ -1,16 +1,21 @@
 package com.example.KindRaise.service;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.KindRaise.dtos.UserProfileImageDto;
+import com.example.KindRaise.model.Notification;
 import com.example.KindRaise.model.User;
 import com.example.KindRaise.repository.UserRepository;
 
@@ -21,6 +26,12 @@ public class UserService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Autowired
+    NotificationService notificationService;
 
 
     public ResponseEntity<?> fetchProfile(){
@@ -93,6 +104,119 @@ public class UserService {
 
            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
 
+        }
+    }
+
+    public ResponseEntity<?> updateProfile(String id,User userData,MultipartFile file){
+            Map<String,Object> responseObject=new HashMap<>();
+        try {
+
+            Optional<User> isUserExists=this.userRepository.findById(id);
+
+            if(isUserExists.isEmpty()){
+                responseObject.put("message", "User not found.");
+                responseObject.put("status", false);
+
+                return new ResponseEntity<>(responseObject,HttpStatus.NOT_FOUND);
+            }
+
+            User user=isUserExists.get();
+
+              if (file != null && !file.isEmpty()) {
+                    user.setImageData(file.getBytes());
+                    user.setImageName(file.getOriginalFilename());
+                    user.setImageType(file.getContentType());
+            }
+        
+
+            user.setFullName(userData.getFullName());
+            user.setPhone(userData.getPhone());
+            user.setUsername(userData.getUsername());
+
+            this.userRepository.save(user);
+            
+            responseObject.put("message", "Profile updated");
+            responseObject.put("status", true);
+
+           return new ResponseEntity<>(responseObject,HttpStatus.OK);
+            
+        } catch (Exception e) {
+           responseObject.put("message", "Something went wrong"+e.getMessage());
+           responseObject.put("status", false);
+
+           return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<?> checkPassword(String id,String password ){
+            Map<String,Object> responseObject=new HashMap<>();
+        try {
+
+            String username=SecurityContextHolder.getContext().getAuthentication().getName();
+
+            User user=this.userRepository.findUserWithoutImage(username);
+
+            System.out.println(user.getPassword());
+
+            boolean isValid= this.bCryptPasswordEncoder.matches(password,user.getPassword());
+
+            if(isValid){
+                responseObject.put("message","Password Correct");
+                responseObject.put("status",true);
+                return new ResponseEntity<>(responseObject,HttpStatus.OK);
+            }else{
+                responseObject.put("message", "Incorrect password");
+                responseObject.put("status", false);
+
+                return new ResponseEntity<>(responseObject,HttpStatus.FORBIDDEN);
+            }
+            
+        } catch (Exception e) {
+            responseObject.put("message", "Something went wrong While checking password"+e.getMessage());
+           responseObject.put("status", false);
+
+           return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
+     public ResponseEntity<?> setNewPassword(String id,String password ){
+            Map<String,Object> responseObject=new HashMap<>();
+        try {
+
+            Optional<User> isUserExists=this.userRepository.findById(id);
+
+            if(isUserExists.isEmpty()){
+                responseObject.put("message","User not found!");
+                responseObject.put("status",false);
+                return new ResponseEntity<>(responseObject,HttpStatus.NOT_FOUND);
+            }
+
+            User user=isUserExists.get();
+            String newPassword=new BCryptPasswordEncoder(12).encode(password);
+            user.setPassword(newPassword);
+            this.userRepository.save(user);
+
+             Notification userNotification=new Notification();
+
+            userNotification.setTitle("Password Updated Successfully");
+
+             userNotification.setMessage("Your account password has been updated successfully. For security reasons, please keep your password confidential.");
+             userNotification.setUser(user);
+             userNotification.setCreatedAt(LocalDateTime.now());
+
+             this.notificationService.addNotification(userNotification);
+
+            responseObject.put("message","Password Changed.");
+            responseObject.put("status",true);
+            return new ResponseEntity<>(responseObject,HttpStatus.OK);
+            
+        } catch (Exception e) {
+            responseObject.put("message", "Something went wrong While checking password"+e.getMessage());
+           responseObject.put("status", false);
+
+           return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
