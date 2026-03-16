@@ -3,6 +3,7 @@ package com.example.KindRaise.service;
 import java.util.HashMap;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -36,7 +37,7 @@ public class NotificationService {
 
 
     public ResponseEntity<?> getUserNotifications(int page,int size){
-        Map<String,Object> hashMap=new HashMap<>();
+        Map<String,Object> responseObject=new HashMap<>();
         try {
 
             String username=SecurityContextHolder.getContext().getAuthentication().getName();
@@ -47,21 +48,68 @@ public class NotificationService {
 
             Page<UserNotificationDto> notifications=this.notificationRepository.findByUserIdWithDto(user.getId(),pageable);
 
-            hashMap.put("notifications", notifications.getContent());
-            hashMap.put("currentPage", notifications.getNumber());
-            hashMap.put("totalPages", notifications.getTotalPages());
-            hashMap.put("totalItems", notifications.getTotalElements());
+            responseObject.put("notifications", notifications.getContent());
+            responseObject.put("currentPage", notifications.getNumber());
+            responseObject.put("totalPages", notifications.getTotalPages());
+            responseObject.put("totalItems", notifications.getTotalElements());
 
             return new ResponseEntity<>(notifications,HttpStatus.OK);
 
         } catch (Exception e) {
-            hashMap.put("message", "Something went wrong "+e.getMessage());
-            hashMap.put("status", false);
+            responseObject.put("message", "Something went wrong "+e.getMessage());
+            responseObject.put("status", false);
 
-            return new ResponseEntity<>(hashMap,HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
             
         }
         
+    }
+
+
+    public ResponseEntity<?> markAsReadNotification(String id) {
+        Map<String,Object> responseObject=new HashMap<>();
+        try {
+            Optional<Notification> isNotificationExists= this.notificationRepository.findById(id);
+            if(isNotificationExists.isEmpty()){
+                 responseObject.put("message","Notification not found");
+                 responseObject.put("status",false);
+                 return new ResponseEntity<>(responseObject,HttpStatus.NOT_FOUND);
+            }
+
+            Notification notification=isNotificationExists.get();
+            notification.setReadStatus(true);
+            this.notificationRepository.save(notification);
+            responseObject.put("message","Notification status updated to read.");
+            responseObject.put("status",true);
+
+            return new ResponseEntity<>(responseObject,HttpStatus.OK);
+
+        } catch (Exception e) {
+            responseObject.put("message", "Something went wrong While Marking as Read "+e.getMessage());
+            responseObject.put("status", false);
+
+            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<?> markAllNotificationOfUserAsRead(){
+        Map<String,Object> responseObject=new HashMap<>();
+        try {
+
+            String username=SecurityContextHolder.getContext().getAuthentication().getName();
+            User user=this.userRepository.findUserWithoutImage(username);
+            this.notificationRepository.markAllNotificationOfUserAsRead(user.getId());
+            responseObject.put("message","Marked all notifications as read");
+            responseObject.put("status",true);
+            
+            return new ResponseEntity<>(responseObject,HttpStatus.OK);
+
+        } catch (Exception e) {
+            responseObject.put("message", "Something went wrong While Marking as Read "+e.getMessage());
+            responseObject.put("status", false);
+
+            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }
