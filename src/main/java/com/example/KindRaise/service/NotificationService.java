@@ -112,4 +112,24 @@ public class NotificationService {
         }
     }
 
+    public ResponseEntity<?> countTotalNumberOfNotificationsUnRead(){
+        Map<String,Object> responseObject=new HashMap<>();
+        try {
+            String username=SecurityContextHolder.getContext().getAuthentication().getName();
+            User user=this.userRepository.findUserWithoutImage(username);
+
+            Long result=this.notificationRepository.countByUserIdAndReadStatus(user.getId(), false);
+             responseObject.put("total",result);
+            responseObject.put("status",true);
+
+            return new ResponseEntity<>(responseObject,HttpStatus.OK);
+
+        } catch (Exception e) {
+            responseObject.put("message", "Something went wrong While Couting the notifications "+e.getMessage());
+            responseObject.put("status", false);
+
+            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

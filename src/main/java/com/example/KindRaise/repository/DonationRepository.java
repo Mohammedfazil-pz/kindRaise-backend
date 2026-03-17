@@ -66,5 +66,15 @@ public interface DonationRepository extends JpaRepository<Donation,String>{
     DonationDto findTopByUserIdOrderByDonationDateDesc(@Param("id")String donorId);
 
 
+            @Query(value = """
+    SELECT TO_CHAR(d.donation_date, 'YYYY-MM') as month,
+           COALESCE(SUM(d.amount), 0) as totalAmount
+    FROM donation d
+    WHERE d.donor_id = :id
+    GROUP BY month
+    ORDER BY month
+""", nativeQuery = true)
+List<Object[]> userDonationsPerMonth(@Param("id") String userId);
+
     
 }

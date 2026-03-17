@@ -36,4 +36,9 @@ public class NotificationController {
     public ResponseEntity<?> markAllNotificationOfUserAsRead(){
         return this.notificationService.markAllNotificationOfUserAsRead();
     }
+
+    @GetMapping("/count/unread")
+    public ResponseEntity<?> countTotalNumberOfNotificationsUnRead(){
+        return this.notificationService.countTotalNumberOfNotificationsUnRead();
+    }
 }

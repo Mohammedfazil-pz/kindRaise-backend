@@ -30,6 +30,9 @@ public interface NotificationRepository extends JpaRepository<Notification,Strin
             UPDATE Notification n set n.readStatus=true WHERE n.user.id=:id
             """)
     void markAllNotificationOfUserAsRead(@Param("id") String id);       
+
+
+    Long countByUserIdAndReadStatus(String userId,Boolean status);
   
 
 }
