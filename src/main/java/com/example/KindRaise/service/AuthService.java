@@ -136,6 +136,7 @@ public class AuthService {
                 return new ResponseEntity<>(responseObject,HttpStatus.NOT_FOUND);
          }
             Authentication authentication=this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
+            
 
             String access_token=this.jwtUtils.generateTokenWithUsername(user.getUsername());
 
@@ -155,7 +156,7 @@ public class AuthService {
             responseObject.put("message", "Invalid username or password.");
             responseObject.put("status", false);
 
-            return new ResponseEntity<>(responseObject, HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(responseObject, HttpStatus.FORBIDDEN);
         } 
         catch (UsernameNotFoundException e) {
 
