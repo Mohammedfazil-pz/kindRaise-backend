@@ -84,11 +84,11 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
             c.user.id,
              java.math.BigDecimal.ZERO,
              0L
-            ) FROM Campaign c WHERE c.status='ACTIVE' AND(
+            ) FROM Campaign c WHERE (:status IS NULL OR c.status=:status) AND(
             COALESCE(:search,'') = '' OR c.title LIKE CONCAT('%',:search,'%') OR c.description LIKE CONCAT('%',:search,'%') 
             ) AND( :category IS NULL OR c.category.id=:category)
             """)
-    List<CampaignDto> findActiveCampaigns(@Param("search") String search,@Param("category") String category); 
+    List<CampaignDto> findActiveCampaigns(@Param("search") String search,@Param("category") String category,@Param("status") String status); 
     
     // For each row in Campaign table, create a new CampaignDto object using this constructor.
     @Query("""
@@ -127,6 +127,8 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
     Long countByUserIdAndStatusIs(String userId,String status);
 
     Long countByStatus(String status);
+
+    Long countByUserIdAndStatus(String id,String status);
 
 
    

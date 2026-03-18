@@ -83,5 +83,10 @@ public interface DonationRepository extends JpaRepository<Donation,String>{
                 """)
         BigDecimal totalAmountRaised();
 
+        @Query("""
+                SELECT SUM(d.amount) FROM Donation d WHERE d.user.id=:id
+                """)
+        BigDecimal totalAmountUserRaised(@Param("id") String id);
+
     
 }

@@ -35,7 +35,7 @@ public class AdminDashboardService {
         Map<String,Object> responseObject=new HashMap<>();
        try {
 
-        Long totalUsers= this.userRepository.count();
+        Long totalUsers= this.userRepository.countByRole("USER");
         Long totalActiveCampaigns=this.campaignRepository.countByStatus("ACTIVE");
         Long totalDonations=this.donationRepository.count();
         BigDecimal totalAmountRaised=this.donationRepository.totalAmountRaised();

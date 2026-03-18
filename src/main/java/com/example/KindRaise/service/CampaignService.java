@@ -155,10 +155,10 @@ public class CampaignService {
     }
 
 
-    public ResponseEntity<?> getActiveCampaigns(String searchQuery,String category) {
+    public ResponseEntity<?> getActiveCampaigns(String searchQuery,String category,String status) {
         Map<String,Object> responseObject=new HashMap<>();
         try {
-            List<CampaignDto> campaigns=this.campaignRepository.findActiveCampaigns(searchQuery,category);
+            List<CampaignDto> campaigns=this.campaignRepository.findActiveCampaigns(searchQuery,category,status);
             List<CampaignTotalDonationDto> campaignTotalDonationDtos=this.donationRepository.findTotalDonationsOfCampaign();
 
             Map<String,BigDecimal> donationMap=campaignTotalDonationDtos.

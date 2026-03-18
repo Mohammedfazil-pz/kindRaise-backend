@@ -61,9 +61,13 @@ public class CampaignController {
 
 
     @GetMapping("/active/campaigns")
-    public ResponseEntity<?> getActiveCampaigns(@RequestParam(value = "search", required = false) String searchQuery,@RequestParam(value = "category", required = false) String category){
+    public ResponseEntity<?> getActiveCampaigns(
+    @RequestParam(value = "search", required = false) String searchQuery,
+    @RequestParam(value = "category", required = false) String category,
+    @RequestParam(value = "status",required = false) String status
+){
         
-        return this.campaignService.getActiveCampaigns(searchQuery,category);
+        return this.campaignService.getActiveCampaigns(searchQuery,category,status);
     }
 
     

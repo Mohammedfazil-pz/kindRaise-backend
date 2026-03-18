@@ -1,5 +1,6 @@
 package com.example.KindRaise.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.KindRaise.dtos.UserProfileImageDto;
 import com.example.KindRaise.model.Notification;
 import com.example.KindRaise.model.User;
+import com.example.KindRaise.repository.CampaignRepository;
 import com.example.KindRaise.repository.DonationRepository;
 import com.example.KindRaise.repository.UserRepository;
 
@@ -36,6 +38,9 @@ public class UserService {
 
     @Autowired
     DonationRepository donationRepository;
+
+    @Autowired
+    CampaignRepository campaignRepository;
 
 
     public ResponseEntity<?> fetchProfile(){
@@ -100,7 +105,14 @@ public class UserService {
 
         try {
             User user=this.userRepository.findUserByIdWithoutImage(id);
-            return new ResponseEntity<>(user,HttpStatus.OK);
+            Long totalDonations=this.donationRepository.countByUserId(id);
+            Long totalCampaignsActive=this.campaignRepository.countByUserIdAndStatus(id,"ACTIVE");
+            BigDecimal TotalAmountDonated=this.donationRepository.totalAmountUserRaised(id);
+            responseObject.put("profile", user);
+            responseObject.put("totalDonations", totalDonations);
+            responseObject.put("totalCampaignsActive", totalCampaignsActive);
+            responseObject.put("totalAmountDonated", TotalAmountDonated);
+            return new ResponseEntity<>(responseObject,HttpStatus.OK);
 
         } catch (Exception e) {
            responseObject.put("message", "Something went wrong"+e.getMessage());

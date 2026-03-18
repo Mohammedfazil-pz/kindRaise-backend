@@ -72,7 +72,7 @@ public interface UserRepository extends JpaRepository<User,String>  {
         SELECT new com.example.KindRaise.model.User(
         u.id,
         u.username,
-        u.password,
+        null,
         u.role,
         u.phone,
         u.fullName,
@@ -82,9 +82,12 @@ public interface UserRepository extends JpaRepository<User,String>  {
         null,
         u.createdAt
         )
-        FROM User u ORDER BY u.createdAt DESC
+        FROM User u WHERE role='USER' ORDER BY u.createdAt DESC
         """)
       List<User> findAllUserWithoutImage(Pageable pageable);
+
+
+      Long countByRole(String role);
 
    
 }
