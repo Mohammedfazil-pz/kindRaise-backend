@@ -9,7 +9,8 @@ import java.util.Map;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -147,7 +148,8 @@ public class DonationService {
     }
     public ResponseEntity<?> getAllDonations() {
         try {
-            List<DonationDto> donations=this.donationRepository.findAllDonationsByDto();
+            Pageable pageable=PageRequest.of(0, 3);
+            List<DonationDto> donations=this.donationRepository.findAllDonationsByDto(pageable);
             return new ResponseEntity<>(donations,HttpStatus.OK);
         } catch (Exception e) {
             responseObject.put("message", "Failed to fetch All donations "+e.getMessage());

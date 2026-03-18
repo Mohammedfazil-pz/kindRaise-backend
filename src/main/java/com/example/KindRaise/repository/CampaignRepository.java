@@ -1,8 +1,10 @@
 package com.example.KindRaise.repository;
 
+
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -103,9 +105,9 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
             c.user.id,
              java.math.BigDecimal.ZERO,
              0L
-            ) FROM Campaign c
+            ) FROM Campaign c ORDER BY c.createdAt DESC
             """)
-    List<CampaignDto> findAllCampaignsWithDto();
+    List<CampaignDto> findAllCampaignsWithDto(Pageable pageable);
     @Query("""
             SELECT new com.example.KindRaise.dtos.CampaignImageDto(c.imageData,c.imageType) FROM Campaign c WHERE c.id=:id
             """)
@@ -115,13 +117,21 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
     @Query("""
              SELECT new com.example.KindRaise.dtos.CampaignDashboardDto(
              COUNT(DISTINCT c.id),COALESCE(SUM(d.amount),0l), COUNT(DISTINCT CASE 
-    WHEN c.status='ACTIVE' THEN c.id 
-END) ) FROM Campaign c
+              WHEN c.status='ACTIVE' THEN c.id 
+             END) ) FROM Campaign c
              LEFT JOIN Donation d ON d.campaign.id=c.id WHERE c.user.id =:userId
                  """)
     CampaignDashboardDto fetchUserCampaignDashboardDetails(@Param("userId") String userId);   
     
     
     Long countByUserIdAndStatusIs(String userId,String status);
+
+    Long countByStatus(String status);
+
+
+   
+
+    
+
 
 }

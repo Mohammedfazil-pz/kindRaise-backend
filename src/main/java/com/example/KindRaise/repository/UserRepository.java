@@ -1,6 +1,9 @@
 package com.example.KindRaise.repository;
 
 
+import java.util.List;
+
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -62,7 +65,26 @@ public interface UserRepository extends JpaRepository<User,String>  {
              u.imageData,u.imageType
              ) FROM User u WHERE u.id=:id 
              """)
-      UserProfileImageDto findUserProfileImageWithDto(@Param("id") String id);       
+      UserProfileImageDto findUserProfileImageWithDto(@Param("id") String id);  
+      
+      
+      @Query("""
+        SELECT new com.example.KindRaise.model.User(
+        u.id,
+        u.username,
+        u.password,
+        u.role,
+        u.phone,
+        u.fullName,
+        u.DOB,
+        null,
+        null,
+        null,
+        u.createdAt
+        )
+        FROM User u ORDER BY u.createdAt DESC
+        """)
+      List<User> findAllUserWithoutImage(Pageable pageable);
 
    
 }

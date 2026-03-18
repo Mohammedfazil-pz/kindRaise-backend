@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -182,7 +184,8 @@ public class CampaignService {
     public ResponseEntity<?> getAllCampaigns() {
         Map<String,Object> responseObject=new HashMap<>();
         try {
-            List<CampaignDto> allCampaignDtos=this.campaignRepository.findAllCampaignsWithDto();
+            Pageable pageable=PageRequest.of(0, 9);
+            List<CampaignDto> allCampaignDtos=this.campaignRepository.findAllCampaignsWithDto(pageable);
             return new ResponseEntity<>(allCampaignDtos,HttpStatus.OK);
         } catch (Exception e) {
              responseObject.put("message", "Error on fetching campaigns "+e.getMessage());

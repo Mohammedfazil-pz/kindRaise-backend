@@ -1,8 +1,9 @@
 package com.example.KindRaise.repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
-
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -37,9 +38,9 @@ public interface DonationRepository extends JpaRepository<Donation,String>{
     @Query("""
             SELECT new com.example.KindRaise.dtos.DonationDto(
             d.id,d.campaign.title,d.amount,d.donationDate,d.transactionId,d.user.id,d.user.fullName
-            ) FROM Donation d 
+            ) FROM Donation d ORDER BY d.createdAt DESC
             """)
-    List<DonationDto> findAllDonationsByDto();
+    List<DonationDto> findAllDonationsByDto(Pageable pageable);
 
     @Query("""
         SELECT new com.example.KindRaise.dtos.CampaignTotalDonationDto(
@@ -58,23 +59,29 @@ public interface DonationRepository extends JpaRepository<Donation,String>{
 
     Long countByUserId(String donorId);   
     
-    @Query("""
-            SELECT new com.example.KindRaise.dtos.DonationDto(
-            d.id,d.campaign.title,d.amount,d.donationDate,d.transactionId,d.user.id,null
-            ) FROM Donation d WHERE d.user.id=:id ORDER BY d.donationDate DESC LIMIT 1
-            """)
-    DonationDto findTopByUserIdOrderByDonationDateDesc(@Param("id")String donorId);
+        @Query("""
+                  SELECT new com.example.KindRaise.dtos.DonationDto(
+                 d.id,d.campaign.title,d.amount,d.donationDate,d.transactionId,d.user.id,null
+                ) FROM Donation d WHERE d.user.id=:id ORDER BY d.donationDate DESC LIMIT 1
+                """)
+                DonationDto findTopByUserIdOrderByDonationDateDesc(@Param("id")String donorId);
 
 
-            @Query(value = """
-    SELECT TO_CHAR(d.donation_date, 'YYYY-MM') as month,
-           COALESCE(SUM(d.amount), 0) as totalAmount
-    FROM donation d
-    WHERE d.donor_id = :id
-    GROUP BY month
-    ORDER BY month
-""", nativeQuery = true)
-List<Object[]> userDonationsPerMonth(@Param("id") String userId);
+        @Query(value = """
+                 SELECT TO_CHAR(d.donation_date, 'YYYY-MM') as month,
+                 COALESCE(SUM(d.amount), 0) as totalAmount
+                 FROM donation d
+                        WHERE d.donor_id = :id
+                        GROUP BY month
+                        ORDER BY month
+                """, nativeQuery = true)
+        List<Object[]> userDonationsPerMonth(@Param("id") String userId);
+
+
+         @Query("""
+                SELECT SUM(d.amount) FROM Donation d
+                """)
+        BigDecimal totalAmountRaised();
 
     
 }
