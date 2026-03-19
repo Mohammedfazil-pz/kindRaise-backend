@@ -1,11 +1,14 @@
 package com.example.KindRaise.repository;
 
 
+import java.time.LocalDate;
+
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -129,6 +132,21 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
     Long countByStatus(String status);
 
     Long countByUserIdAndStatus(String id,String status);
+
+    @Modifying
+    @Query("""
+         UPDATE Campaign c SET c.status='COMPLETED' WHERE c.status='ACTIVE' AND(
+         SELECT COALESCE(SUM(d.amount),0) FROM Donation d WHERE d.campaign.id=c.id
+         ) >=c.goalAmount
+                    """)
+    int markCompleted();
+
+
+    @Modifying
+    @Query("""
+           UPDATE Campaign c SET status='EXPIRED' WHERE c.deadline<:now AND c.status='ACTIVE'
+                    """)
+    int markExpired(@Param("now") LocalDate now);
 
 
    

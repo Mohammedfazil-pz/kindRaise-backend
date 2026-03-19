@@ -73,7 +73,11 @@ public class CampaignService {
                 campaign.setImageType(file.getContentType());
             }
 
-            campaign.setStatus("PENDING");
+           if (campaignRequestDto.getStatus() != null && !campaignRequestDto.getStatus().isEmpty()) {
+              campaign.setStatus(campaignRequestDto.getStatus());
+           } else {
+                campaign.setStatus("PENDING");
+            }
 
             User userDetails=this.userRepository.findUserWithoutImage(username);
             campaign.setUser(userDetails);
@@ -85,6 +89,8 @@ public class CampaignService {
             campaign.setDescription(campaignRequestDto.getDescription());
             campaign.setDeadline(campaignRequestDto.getDeadline());
             campaign.setCategory(isCategoryExists);
+
+            
 
            
 

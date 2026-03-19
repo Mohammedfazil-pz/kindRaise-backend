@@ -17,6 +17,6 @@ public class CampaignRequestDto {
     private BigDecimal goalAmount;
     private LocalDate deadline;
     private String categoryId;
-
+    private String status;
 
 }
