@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -74,7 +76,7 @@ public class AdminDashboardService {
         Map<String,Object> responseObject=new HashMap<>();
         try {
             Pageable pageable=PageRequest.of(0, 3);
-            List<DonationDto> donations=this.donationRepository.findAllDonationsByDto(pageable);
+            Page<DonationDto> donations=this.donationRepository.findAllDonationsByDto(pageable);
             return new ResponseEntity<>(donations,HttpStatus.OK);
         } catch (Exception e) {
             responseObject.put("message", "Failed to fetch Recent Donations "+e.getMessage());

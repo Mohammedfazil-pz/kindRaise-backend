@@ -3,6 +3,7 @@ package com.example.KindRaise.repository;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -20,7 +21,7 @@ import com.example.KindRaise.model.Donation;
 public interface DonationRepository extends JpaRepository<Donation,String>{
     @Query("""
             SELECT new com.example.KindRaise.dtos.DonationDto(
-            d.id,d.campaign.title,d.amount,d.donationDate,d.transactionId,d.user.id,d.user.fullName
+            d.id,d.campaign.title,d.amount,d.createdAt,d.transactionId,d.user.id,d.user.fullName
             ) FROM Donation d WHERE d.campaign.id=:id
             """)
     List<DonationDto> findByCampaignIdByDto(@Param("id") String id);
@@ -37,10 +38,10 @@ public interface DonationRepository extends JpaRepository<Donation,String>{
 
     @Query("""
             SELECT new com.example.KindRaise.dtos.DonationDto(
-            d.id,d.campaign.title,d.amount,d.donationDate,d.transactionId,d.user.id,d.user.fullName
+            d.id,d.campaign.title,d.amount,d.createdAt,d.transactionId,d.user.id,d.user.fullName
             ) FROM Donation d ORDER BY d.createdAt DESC
             """)
-    List<DonationDto> findAllDonationsByDto(Pageable pageable);
+    Page<DonationDto> findAllDonationsByDto(Pageable pageable);
 
     @Query("""
         SELECT new com.example.KindRaise.dtos.CampaignTotalDonationDto(
@@ -61,7 +62,7 @@ public interface DonationRepository extends JpaRepository<Donation,String>{
     
         @Query("""
                   SELECT new com.example.KindRaise.dtos.DonationDto(
-                 d.id,d.campaign.title,d.amount,d.donationDate,d.transactionId,d.user.id,null
+                 d.id,d.campaign.title,d.amount,d.createdAt,d.transactionId,d.user.id,null
                 ) FROM Donation d WHERE d.user.id=:id ORDER BY d.donationDate DESC LIMIT 1
                 """)
                 DonationDto findTopByUserIdOrderByDonationDateDesc(@Param("id")String donorId);

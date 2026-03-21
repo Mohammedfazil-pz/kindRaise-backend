@@ -22,9 +22,9 @@ public class CampaignDto {
     private String category_title;
     private String status;
     private String user_id;
+    private String creatorName;
     private BigDecimal amount;
     private Long totalDonors;
-    
 
     
 }

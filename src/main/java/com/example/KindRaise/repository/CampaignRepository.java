@@ -32,6 +32,7 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
         c.category.title,
         c.status,
         c.user.id,
+        c.user.fullName,
         COALESCE(SUM(d.amount),0),
         COUNT(DISTINCT d.user.id)
     )
@@ -43,7 +44,7 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
     c.category.id,
     c.category.title,
     c.status,
-    c.user.id ORDER BY 
+    c.user.id,c.user.fullName ORDER BY 
     CASE WHEN c.status = 'ACTIVE' THEN 0 ELSE 1 END,
     c.createdAt DESC
     """)
@@ -59,6 +60,7 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
     c.category.title,
     c.status,
     c.user.id,
+    c.user.fullName,
     COALESCE(SUM(d.amount),0),
     COUNT(DISTINCT d.user.id)
     )
@@ -70,7 +72,8 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
     c.category.id,
     c.category.title,
     c.status,
-    c.user.id
+    c.user.id,
+    c.user.fullName
     """)
     Optional<CampaignDto> findCampaignDtoById(@Param("id") String id);
 
@@ -85,10 +88,12 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
             c.category.title,
             c.status,
             c.user.id,
+            c.user.fullName,
              java.math.BigDecimal.ZERO,
              0L
             ) FROM Campaign c WHERE (:status IS NULL OR c.status=:status) AND(
-            COALESCE(:search,'') = '' OR c.title LIKE CONCAT('%',:search,'%') OR c.description LIKE CONCAT('%',:search,'%') 
+            COALESCE(:search,'') = '' OR LOWER(c.title) LIKE LOWER(CONCAT('%', :search, '%')) 
+OR LOWER(c.description) LIKE LOWER(CONCAT('%', :search, '%')) 
             ) AND( :category IS NULL OR c.category.id=:category)
             """)
     List<CampaignDto> findActiveCampaigns(@Param("search") String search,@Param("category") String category,@Param("status") String status); 
@@ -106,6 +111,7 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
             c.category.title,
             c.status,
             c.user.id,
+            c.user.fullName,
              java.math.BigDecimal.ZERO,
              0L
             ) FROM Campaign c ORDER BY c.createdAt DESC

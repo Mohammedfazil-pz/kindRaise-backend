@@ -93,6 +93,11 @@ public class CampaignController {
         return this.campaignService.userCampaignDashboard();
     }
 
+    @GetMapping("/pending/count")
+    public ResponseEntity<?> getTotalNumberOfPendingRequests(){
+        return this.campaignService.getTotalNumberOfPendingRequests();
+    }
+
    
 
     

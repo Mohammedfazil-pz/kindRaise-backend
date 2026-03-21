@@ -9,6 +9,7 @@ import java.util.Map;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -146,10 +147,10 @@ public class DonationService {
             return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    public ResponseEntity<?> getAllDonations() {
+    public ResponseEntity<?> getAllDonations(int page, int size) {
         try {
-            Pageable pageable=PageRequest.of(0, 3);
-            List<DonationDto> donations=this.donationRepository.findAllDonationsByDto(pageable);
+            Pageable pageable=PageRequest.of(page, size);
+            Page<DonationDto> donations=this.donationRepository.findAllDonationsByDto(pageable);
             return new ResponseEntity<>(donations,HttpStatus.OK);
         } catch (Exception e) {
             responseObject.put("message", "Failed to fetch All donations "+e.getMessage());

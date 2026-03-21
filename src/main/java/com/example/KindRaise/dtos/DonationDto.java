@@ -1,7 +1,7 @@
 package com.example.KindRaise.dtos;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,10 +14,9 @@ public class DonationDto {
     private String id;
     private String title;
     private BigDecimal amount;
-    private LocalDate donationDate;
+    private LocalDateTime donationDate;
     private String transactionId;
     private String user_id;
     private String fullName;
-    // private String campaign_id;
-
+    
 }

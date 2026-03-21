@@ -338,4 +338,19 @@ public class CampaignService {
         }
     }
 
+    public ResponseEntity<?> getTotalNumberOfPendingRequests(){
+         Map<String,Object> responseObject=new HashMap<>();
+        try {
+            Long total=this.campaignRepository.countByStatus("PENDING");
+            return new ResponseEntity<>(total, HttpStatus.OK);
+        } catch (Exception e) {
+           responseObject.put("message", "Failed to fetch The count of Total Pending Requests "+e.getMessage());
+            responseObject.put("status", false);
+
+            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    
+
 }
