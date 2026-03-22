@@ -40,6 +40,8 @@ public class User {
     private String phone;
     @Column(nullable = false)
     private String fullName;
+     @Column(nullable = false)
+    private String status;
     private LocalDate DOB;
     @JsonIgnore
     @Lob

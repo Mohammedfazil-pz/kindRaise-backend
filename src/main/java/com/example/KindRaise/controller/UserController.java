@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -54,6 +55,15 @@ public class UserController {
     public ResponseEntity<?> setNewPassword(@PathVariable String id,@PathVariable String password){
         return this.userService.setNewPassword(id, password);
     }  
+
+
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllUsers(
+    @RequestParam(defaultValue = "") String search,
+    @RequestParam(defaultValue = "") String role,
+    @RequestParam(defaultValue="0") int page){
+        return this.userService.getAllUsers(search,role,page);
+    }
 
 
 }

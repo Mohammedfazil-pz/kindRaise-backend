@@ -7,6 +7,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.KindRaise.dtos.UserProfileDto;
 import com.example.KindRaise.dtos.UserProfileImageDto;
 import com.example.KindRaise.model.Notification;
 import com.example.KindRaise.model.User;
@@ -235,6 +239,25 @@ public class UserService {
            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+     public ResponseEntity<?> getAllUsers(String search,String role,int page) {
+         Map<String,Object> responseObject=new HashMap<>();
+       try {
+
+        String username=SecurityContextHolder.getContext().getAuthentication().getName();
+
+        Pageable pageable=PageRequest.of(page, 6);
+        Page<UserProfileDto> allUsers=this.userRepository.findAllUserWithDto(search,role,pageable,username);
+
+        return new ResponseEntity<>(allUsers,HttpStatus.OK);
+
+       } catch (Exception e) {
+           responseObject.put("message", "Something went wrong While Fetching users"+e.getMessage());
+           responseObject.put("status", false);
+
+           return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+       }
+     }
 
     
 

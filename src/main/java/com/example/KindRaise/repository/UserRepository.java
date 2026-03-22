@@ -3,12 +3,14 @@ package com.example.KindRaise.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.example.KindRaise.dtos.UserProfileDto;
 import com.example.KindRaise.dtos.UserProfileImageDto;
 import com.example.KindRaise.model.User;
 
@@ -25,6 +27,7 @@ public interface UserRepository extends JpaRepository<User,String>  {
         u.username,
         u.password,
         u.role,
+        u.status,
         u.phone,
         u.fullName,
         u.DOB,
@@ -46,6 +49,7 @@ public interface UserRepository extends JpaRepository<User,String>  {
         u.username,
         u.password,
         u.role,
+         u.status,
         u.phone,
         u.fullName,
         u.DOB,
@@ -74,6 +78,7 @@ public interface UserRepository extends JpaRepository<User,String>  {
         u.username,
         null,
         u.role,
+         u.status,
         u.phone,
         u.fullName,
         u.DOB,
@@ -88,6 +93,19 @@ public interface UserRepository extends JpaRepository<User,String>  {
 
 
       Long countByRole(String role);
+
+     @Query("""
+           SELECT new com.example.KindRaise.dtos.UserProfileDto(
+           u.id,u.fullName,u.phone,u.role,u.status,u.username,u.createdAt)
+           FROM User u WHERE 
+           (COALESCE(:search,'')='' OR LOWER(u.fullName) LIKE LOWER(CONCAT('%',:search,'%')))
+           AND
+           (COALESCE(:role,'')='' OR u.role=:role) 
+           AND
+           (u.username!=:username)
+           ORDER BY u.createdAt DESC
+           """)
+     Page<UserProfileDto> findAllUserWithDto(String search, String role, Pageable page,String username);
 
    
 }
