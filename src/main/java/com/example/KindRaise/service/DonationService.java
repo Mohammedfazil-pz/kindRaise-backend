@@ -1,6 +1,7 @@
 package com.example.KindRaise.service;
 
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -32,6 +33,7 @@ import com.example.KindRaise.repository.CampaignRepository;
 import com.example.KindRaise.repository.DonationRepository;
 import com.example.KindRaise.repository.TransactionRepository;
 import com.example.KindRaise.repository.UserRepository;
+
 
 import jakarta.transaction.Transactional;
 
@@ -147,10 +149,10 @@ public class DonationService {
             return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    public ResponseEntity<?> getAllDonations(int page, int size) {
+    public ResponseEntity<?> getAllDonations(int page, int size,String search) {
         try {
             Pageable pageable=PageRequest.of(page, size);
-            Page<DonationDto> donations=this.donationRepository.findAllDonationsByDto(pageable);
+            Page<DonationDto> donations=this.donationRepository.findAllDonationsByDto(pageable,search);
             return new ResponseEntity<>(donations,HttpStatus.OK);
         } catch (Exception e) {
             responseObject.put("message", "Failed to fetch All donations "+e.getMessage());
@@ -181,7 +183,36 @@ public class DonationService {
             return new ResponseEntity<>(donationUserStatsDto,HttpStatus.OK);
             
         } catch (Exception e) {
-            responseObject.put("message", "Something went wrong while fetching donations "+e.getMessage());
+            responseObject.put("message", "Something went wrong while fetching dashboardStats "+e.getMessage());
+            responseObject.put("status", false);
+
+            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    public ResponseEntity<?> getAdminDashboardDonationStats() {
+         Map<String,Object> responseObject=new HashMap<>();
+        try {
+            // gets the date
+            LocalDate today = LocalDate.now();
+            // Converts date → datetime at 00:00:00
+            LocalDateTime start=today.atStartOfDay();
+            // Sets time to end of day
+            LocalDateTime end=today.atTime(23,59,59);
+
+            Long totalDonations=this.donationRepository.count();
+            BigDecimal totalAmountRaised=this.donationRepository.totalAmountRaised();
+            BigDecimal todayDonations=this.donationRepository.findTodayDonations(start,end);
+            Long totalDonors=this.donationRepository.countTotalDonors();
+
+            responseObject.put("totalDonations", totalDonations);
+            responseObject.put("totalAmountRaised", totalAmountRaised);
+            responseObject.put("todayDonations", todayDonations);
+            responseObject.put("totalDonors", totalDonors);
+
+            return new ResponseEntity<>(responseObject,HttpStatus.OK);
+
+        } catch (Exception e) {
+            responseObject.put("message", "Something went wrong while fetching admin dashboard donation stats "+e.getMessage());
             responseObject.put("status", false);
 
             return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);

@@ -38,12 +38,20 @@ public class DonationController {
 
     @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> getAllDonations(@RequestParam(defaultValue = "0") int page,@RequestParam(defaultValue = "7") int size){
-        return this.donationService.getAllDonations(page,size);
+    public ResponseEntity<?> getAllDonations(@RequestParam(defaultValue = "0") int page,@RequestParam(defaultValue = "7") int size,
+    @RequestParam(defaultValue = "") String search
+){
+        return this.donationService.getAllDonations(page,size,search);
     }
 
     @GetMapping("/dashboard/user/stats")
     public ResponseEntity<?> getDashboardStats(){
         return this.donationService.getDashboardStats();
+    }
+
+    @GetMapping("/admin/dashboard/donation/stats")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getAdminDashboardDonationStats(){
+        return this.donationService.getAdminDashboardDonationStats();
     }
 }

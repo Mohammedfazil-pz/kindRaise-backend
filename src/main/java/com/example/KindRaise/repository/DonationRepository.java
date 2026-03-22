@@ -1,6 +1,7 @@
 package com.example.KindRaise.repository;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -39,9 +40,12 @@ public interface DonationRepository extends JpaRepository<Donation,String>{
     @Query("""
             SELECT new com.example.KindRaise.dtos.DonationDto(
             d.id,d.campaign.title,d.amount,d.createdAt,d.transactionId,d.user.id,d.user.fullName
-            ) FROM Donation d ORDER BY d.createdAt DESC
+            ) FROM Donation d WHERE COALESCE(:search,'') = '' OR 
+             LOWER(d.user.fullName) LIKE LOWER(CONCAT('%',:search,'%')) OR 
+             LOWER(d.campaign.title) LIKE LOWER(CONCAT('%',:search,'%'))
+            ORDER BY d.createdAt DESC
             """)
-    Page<DonationDto> findAllDonationsByDto(Pageable pageable);
+    Page<DonationDto> findAllDonationsByDto(Pageable pageable,String search);
 
     @Query("""
         SELECT new com.example.KindRaise.dtos.CampaignTotalDonationDto(
@@ -88,6 +92,16 @@ public interface DonationRepository extends JpaRepository<Donation,String>{
                 SELECT SUM(d.amount) FROM Donation d WHERE d.user.id=:id
                 """)
         BigDecimal totalAmountUserRaised(@Param("id") String id);
+
+        @Query("""
+                SELECT COALESCE(SUM(d.amount), 0)  FROM Donation d WHERE d.createdAt BETWEEN :start AND :end
+                """)
+        BigDecimal findTodayDonations(LocalDateTime start, LocalDateTime end);
+
+        @Query("""
+                SELECT COUNT(DISTINCT d.user.id) FROM Donation d 
+                        """)
+        Long countTotalDonors();
 
     
 }

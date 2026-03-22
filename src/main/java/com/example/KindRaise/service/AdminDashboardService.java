@@ -76,7 +76,7 @@ public class AdminDashboardService {
         Map<String,Object> responseObject=new HashMap<>();
         try {
             Pageable pageable=PageRequest.of(0, 3);
-            Page<DonationDto> donations=this.donationRepository.findAllDonationsByDto(pageable);
+            Page<DonationDto> donations=this.donationRepository.findAllDonationsByDto(pageable,"");
             return new ResponseEntity<>(donations,HttpStatus.OK);
         } catch (Exception e) {
             responseObject.put("message", "Failed to fetch Recent Donations "+e.getMessage());
