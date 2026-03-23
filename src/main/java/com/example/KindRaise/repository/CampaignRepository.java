@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -48,7 +49,7 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
     CASE WHEN c.status = 'ACTIVE' THEN 0 ELSE 1 END,
     c.createdAt DESC
     """)
-    List<CampaignDto> findUserCampaigns(@Param("userId") String userId);
+    Page<CampaignDto> findUserCampaigns(@Param("userId") String userId,Pageable pageable);
   @Query("""
     SELECT new com.example.KindRaise.dtos.CampaignDto(
     c.id,
@@ -153,6 +154,8 @@ OR LOWER(c.description) LIKE LOWER(CONCAT('%', :search, '%'))
            UPDATE Campaign c SET status='EXPIRED' WHERE c.deadline<:now AND c.status='ACTIVE'
                     """)
     int markExpired(@Param("now") LocalDate now);
+
+    Long countByUserId(String userId);
 
 
    

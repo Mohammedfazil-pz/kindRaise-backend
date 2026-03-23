@@ -103,5 +103,13 @@ public interface DonationRepository extends JpaRepository<Donation,String>{
                         """)
         Long countTotalDonors();
 
+        @Query("""
+                SELECT COUNT(DISTINCT d.campaign.id) FROM Donation d WHERE d.user.id=:id
+                        """)
+        Long totalCampaignsSupported(String id);
+
+
+        
+
     
 }

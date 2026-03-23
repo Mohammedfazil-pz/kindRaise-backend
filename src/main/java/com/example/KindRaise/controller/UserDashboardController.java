@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.KindRaise.service.UserDashboardService;
@@ -24,7 +25,7 @@ public class UserDashboardController {
 
     @GetMapping("/chart")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    public ResponseEntity<?> userDashboardChartDetails(){
-        return this.userDashboardService.userDonationsPerMonth();
+    public ResponseEntity<?> userDashboardChartDetails(@RequestParam(required = false) String id){
+        return this.userDashboardService.userDonationsPerMonth(id);
     }
 }

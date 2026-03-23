@@ -36,9 +36,13 @@ public class CampaignController {
     }
 
     @GetMapping("/user/campaigns")
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> getUserCampaigns(){
-        return this.campaignService.getUserCampaigns();
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    public ResponseEntity<?> getUserCampaigns(
+        @RequestParam(required = false) String userId,
+        @RequestParam(defaultValue = "0") int currentPage,
+        @RequestParam(defaultValue = "7") int sizePerPage
+    ){
+        return this.campaignService.getUserCampaigns(userId,currentPage,sizePerPage);
     }
     
     @GetMapping("/user/campaign/{id}")
@@ -96,6 +100,11 @@ public class CampaignController {
     @GetMapping("/pending/count")
     public ResponseEntity<?> getTotalNumberOfPendingRequests(){
         return this.campaignService.getTotalNumberOfPendingRequests();
+    }
+
+    @GetMapping("/user/totalcampaigns/{id}")
+    public ResponseEntity<?> getTotalNumberOfCampaginsOfUser(@PathVariable String id){
+        return this.campaignService.getTotalNumberOfCampaginsOfUser(id);
     }
 
    

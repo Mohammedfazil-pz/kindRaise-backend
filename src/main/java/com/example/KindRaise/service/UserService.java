@@ -111,11 +111,14 @@ public class UserService {
             User user=this.userRepository.findUserByIdWithoutImage(id);
             Long totalDonations=this.donationRepository.countByUserId(id);
             Long totalCampaignsActive=this.campaignRepository.countByUserIdAndStatus(id,"ACTIVE");
-            BigDecimal TotalAmountDonated=this.donationRepository.totalAmountUserRaised(id);
+            BigDecimal totalAmountDonated=this.donationRepository.totalAmountUserRaised(id);
+            Long totalCampaignsDonated=this.donationRepository.totalCampaignsSupported(id);
+
             responseObject.put("profile", user);
             responseObject.put("totalDonations", totalDonations);
             responseObject.put("totalCampaignsActive", totalCampaignsActive);
-            responseObject.put("totalAmountDonated", TotalAmountDonated);
+            responseObject.put("totalAmountDonated", totalAmountDonated);
+            responseObject.put("totalCampaignsDonated", totalCampaignsDonated);
             return new ResponseEntity<>(responseObject,HttpStatus.OK);
 
         } catch (Exception e) {
@@ -258,6 +261,12 @@ public class UserService {
            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
        }
      }
+
+
+
+     
+
+
 
     
 

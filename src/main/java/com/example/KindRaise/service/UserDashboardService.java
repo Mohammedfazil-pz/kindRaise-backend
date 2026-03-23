@@ -57,14 +57,25 @@ public class UserDashboardService {
            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    public ResponseEntity<?> userDonationsPerMonth(){
+
+    public ResponseEntity<?> userDonationsPerMonth(String userIdFromAdmin){
         Map<String,Object> responseObject=new HashMap<>();
         try {
+
+            String userId;
 
             String username=SecurityContextHolder.getContext().getAuthentication().getName();
             User user=this.userRepository.findUserWithoutImage(username);
 
-           List<Object[]> userDonations=this.donationRepository.userDonationsPerMonth(user.getId());
+            System.out.println(user.getRole());
+
+            if(user.getRole().equals("USER")){
+                userId=user.getId();
+            }else{
+                userId=userIdFromAdmin;
+            }
+
+           List<Object[]> userDonations=this.donationRepository.userDonationsPerMonth(userId);
 
            List<UserDashboardChartDto> result=userDonations.stream()
            .map((each)->new UserDashboardChartDto((String)each[0],(BigDecimal)each[1])).toList();

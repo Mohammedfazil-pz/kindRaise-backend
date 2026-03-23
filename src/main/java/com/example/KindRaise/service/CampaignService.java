@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -128,14 +129,25 @@ public class CampaignService {
     }
 
    
-    public ResponseEntity<?> getUserCampaigns() {
+    public ResponseEntity<?> getUserCampaigns(String userIdFromAdminDashboard,int currentPage,int size) {
         Map<String,Object> responseObject=new HashMap<>();
-
         try {
+
+            String userId;
+
             String username=SecurityContextHolder.getContext().getAuthentication().getName();
             System.out.println("Username"+username);
             User userDetails=this.userRepository.findUserWithoutImage(username);
-            List<CampaignDto> userCampaigns=this.campaignRepository.findUserCampaigns(userDetails.getId());
+
+            if(userDetails.getRole().equals("USER")){
+                userId=userDetails.getId();
+            }else{
+                userId=userIdFromAdminDashboard;
+            }
+
+            Pageable page=PageRequest.of(currentPage, size);
+
+            Page<CampaignDto> userCampaigns=this.campaignRepository.findUserCampaigns(userId,page);
             return new ResponseEntity<>(userCampaigns,HttpStatus.OK);
         } catch (Exception e) {
              responseObject.put("message", "Error on fetching campaigns "+e.getMessage());
@@ -345,6 +357,21 @@ public class CampaignService {
             return new ResponseEntity<>(total, HttpStatus.OK);
         } catch (Exception e) {
            responseObject.put("message", "Failed to fetch The count of Total Pending Requests "+e.getMessage());
+            responseObject.put("status", false);
+
+            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    public ResponseEntity<?> getTotalNumberOfCampaginsOfUser(String id) {
+        Map<String,Object> responseObject=new HashMap<>();
+        try {
+            Long total=this.campaignRepository.countByUserId(id);
+            System.out.println(total);
+            return new ResponseEntity<>(total, HttpStatus.OK);
+        } catch (Exception e) {
+            responseObject.put("message", "Failed to fetch The count of Total Campaigns Of User "+e.getMessage());
             responseObject.put("status", false);
 
             return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
