@@ -99,5 +99,29 @@ public class AdminDashboardService {
             return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    public ResponseEntity<?> getAdminAnalyticsPageStatsData(){
+          Map<String,Object> responseObject=new HashMap<>();
+        try {
+
+            Long totalDonations=this.donationRepository.count();
+            BigDecimal totalAmountRaised=this.donationRepository.totalAmountRaised();
+            Long totalUsers=this.userRepository.countByRole("USER");
+            Long totalActiveCampaigns=this.campaignRepository.countByStatusIn(List.of("ACTIVE","COMPLETED"));
+
+            responseObject.put("totalDonations", totalDonations);
+            responseObject.put("totalAmountRaised", totalAmountRaised);
+            responseObject.put("totalUsers", totalUsers);
+            responseObject.put("totalActiveCampaigns", totalActiveCampaigns);
+
+            return new ResponseEntity<>(responseObject,HttpStatus.OK);
+            
+        } catch (Exception e) {
+            responseObject.put("message", "Failed to fetch analytics details "+e.getMessage());
+            responseObject.put("status", false);
+
+            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
     
 }

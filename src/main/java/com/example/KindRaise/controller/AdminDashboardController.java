@@ -18,23 +18,33 @@ public class AdminDashboardController {
     AdminDashboardService adminDashboardService;
     
     @GetMapping("/stats")
+     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> adminDashboardStatsDetails(){
         return this.adminDashboardService.adminDashboardStatsDetails();
     }
 
     @GetMapping("/recent/campaigns")
+     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getRecentCampaigns(){
         return this.adminDashboardService.getRecentCampaigns();
     }
 
     @GetMapping("/recent/donations")
+     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getRecentDonations(){
         return this.adminDashboardService.getRecentDonations();
     }
 
     @GetMapping("/recent/users")
+     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getRecentUsers(){
         return this.adminDashboardService.getRecentUsers();
+    }
+
+    @GetMapping("/analytics/stats")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getAdminAnalyticsPageStatsData(){
+        return this.adminDashboardService.getAdminAnalyticsPageStatsData();
     }
     
 }

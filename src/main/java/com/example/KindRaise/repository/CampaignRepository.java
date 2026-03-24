@@ -169,5 +169,7 @@ OR LOWER(c.description) LIKE LOWER(CONCAT('%', :search, '%'))
     List<CampaignTitleDto> findAllActiveCampaignTitleWithDto();
     
 
+     Long countByStatusIn(List<String> statuses);
+
 
 }
