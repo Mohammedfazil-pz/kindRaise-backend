@@ -39,10 +39,10 @@ public class PaymentGatewayController{
         return this.paymentGatewayService.enableGateway(id);
     }
 
-    @GetMapping("/fetch/gateways")
+    @GetMapping("/fetch/razorpay")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> fetchGateways(){
-        return this.paymentGatewayService.fetchGateways();
+    public ResponseEntity<?> fetchRazorPayGateway(){
+        return this.paymentGatewayService.fetchRazorPayGateway();
     }
 
     @PutMapping("/update/gateway/{id}")

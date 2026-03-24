@@ -3,7 +3,7 @@ package com.example.KindRaise.service;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
+
 import java.util.Map;
 import java.util.Optional;
 
@@ -83,10 +83,10 @@ public class PaymentGatewayService {
         }
     }
 
-    public ResponseEntity<?> fetchGateways() {
+    public ResponseEntity<?> fetchRazorPayGateway() {
             try {
-                List<PaymentGateway> paymentGateways=this.paymentGatewayRepository.findAll();
-                  return new ResponseEntity<>(paymentGateways,HttpStatus.OK);
+                PaymentGateway razorPay=this.paymentGatewayRepository.findByActiveTrue().get();
+                  return new ResponseEntity<>(razorPay,HttpStatus.OK);
 
             } catch (Exception e) {
                   responseObject.put("message", "Failed on Fetching a Gateway "+e.getMessage());

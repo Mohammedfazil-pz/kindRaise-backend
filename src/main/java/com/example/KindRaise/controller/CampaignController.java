@@ -109,6 +109,12 @@ public class CampaignController {
         return this.campaignService.getTotalNumberOfCampaginsOfUser(id);
     }
 
+    @GetMapping("/titles")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> fetchAllActiveCampaignsTitle(){
+        return this.campaignService.fetchAllActiveCampaignsTitle();
+    }
+
    
 
     

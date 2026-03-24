@@ -24,8 +24,7 @@ import com.example.KindRaise.dtos.CampaignDashboardDto;
 import com.example.KindRaise.dtos.CampaignDto;
 import com.example.KindRaise.dtos.CampaignImageDto;
 import com.example.KindRaise.dtos.CampaignRequestDto;
-
-
+import com.example.KindRaise.dtos.CampaignTitleDto;
 import com.example.KindRaise.model.Campaign;
 import com.example.KindRaise.model.Category;
 import com.example.KindRaise.model.Notification;
@@ -368,6 +367,19 @@ public class CampaignService {
 
             return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public ResponseEntity<?> fetchAllActiveCampaignsTitle(){
+         Map<String,Object> responseObject=new HashMap<>();
+         try {
+            List<CampaignTitleDto> campaignTitleDtos=this.campaignRepository.findAllActiveCampaignTitleWithDto();
+            return new ResponseEntity<>(campaignTitleDtos,HttpStatus.OK);
+         } catch (Exception e) {
+            responseObject.put("message", "Failed to fetch all Campaigns Title "+e.getMessage());
+            responseObject.put("status", false);
+
+            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+         }
     }
 
     

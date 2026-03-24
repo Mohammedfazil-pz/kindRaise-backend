@@ -20,8 +20,14 @@ public class TransactionController {
 
     @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> getAllTransactions(){
-        return this.transactionService.getAllTransactions();
+    public ResponseEntity<?> getAllTransactions(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "8") int size,
+        @RequestParam(required = false) String campaignId,
+        @RequestParam(required = false) String status,
+        @RequestParam(required = false) String search
+    ){
+        return this.transactionService.getAllTransactions(page,size,campaignId,status,search);
     }
     @GetMapping("/user/all/{id}")
     @PreAuthorize("hasRole('ADMIN')")

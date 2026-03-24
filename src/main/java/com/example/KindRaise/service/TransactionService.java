@@ -24,10 +24,11 @@ public class TransactionService {
 
      Map<String,Object> responseObject=new HashMap<>();
 
-     public ResponseEntity<?> getAllTransactions() {
+     public ResponseEntity<?> getAllTransactions(int page,int size,String campaignId,String status,String search) {
           Map<String,Object> responseObject=new HashMap<>();
         try {
-            List<TransactionDto> donations=this.transactionRepository.findAllTransactionsByDto();
+            Pageable pageable=PageRequest.of(page,size);
+            Page<TransactionDto> donations=this.transactionRepository.findAllTransactionsByDto(search,campaignId,status,pageable);
             return new ResponseEntity<>(donations,HttpStatus.OK);
         } catch (Exception e) {
             responseObject.put("message", "Failed to fetch All Transactions "+e.getMessage());

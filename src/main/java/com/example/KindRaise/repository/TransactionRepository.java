@@ -16,21 +16,26 @@ public interface TransactionRepository extends JpaRepository<PaymentTransaction,
 
     @Query("""
             SELECT new com.example.KindRaise.dtos.TransactionDto(
-            t.id,t.amount,t.transactionStatus,t.PaymentReference,t.transactionDate,t.campaign.id,t.campaign.title,t.user.id,t.user.fullName
-            ) FROM PaymentTransaction t
+            t.id,t.amount,t.transactionStatus,t.PaymentReference,t.transactionDate,t.campaign.id,t.campaign.title,t.user.id,t.user.fullName,t.paymentMethod
+            ) FROM PaymentTransaction t WHERE 
+             (COALESCE(:search,'')='' OR LOWER(t.user.fullName) LIKE LOWER(CONCAT('%',:search,'%')) OR
+             LOWER(t.campaign.title) LIKE LOWER(CONCAT('%',:search,'%'))
+             )
+             AND (COALESCE(:campaignId,'')='' OR t.campaign.id=:campaignId) AND
+             (COALESCE(:status,'')='' OR t.transactionStatus=:status) ORDER BY transactionDate DESC
             """)
-    public List<TransactionDto> findAllTransactionsByDto();
+    public Page<TransactionDto> findAllTransactionsByDto(String search,String campaignId,String status,Pageable page);
 
     @Query("""
              SELECT new com.example.KindRaise.dtos.TransactionDto(
-            t.id,t.amount,t.transactionStatus,t.PaymentReference,t.transactionDate,t.campaign.id,t.campaign.title,t.user.id,t.user.fullName
+            t.id,t.amount,t.transactionStatus,t.PaymentReference,t.transactionDate,t.campaign.id,t.campaign.title,t.user.id,t.user.fullName,t.paymentMethod
             ) FROM PaymentTransaction t WHERE t.user.id=:userId ORDER BY t.transactionDate DESC
             """)
     Page<TransactionDto> findUserTransactionsWithDto(String userId,Pageable page);
 
     @Query("""
          SELECT new com.example.KindRaise.dtos.TransactionDto(
-            t.id,t.amount,t.transactionStatus,t.PaymentReference,t.transactionDate,t.campaign.id,t.campaign.title,t.user.id,t.user.fullName
+            t.id,t.amount,t.transactionStatus,t.PaymentReference,t.transactionDate,t.campaign.id,t.campaign.title,t.user.id,t.user.fullName,t.paymentMethod
             ) FROM PaymentTransaction t WHERE t.user.id=:userId ORDER BY t.transactionDate DESC
     """)
     List<TransactionDto> findByUserIdWithDto(String userId);

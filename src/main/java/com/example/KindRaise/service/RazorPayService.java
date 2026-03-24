@@ -217,4 +217,29 @@ public class RazorPayService {
         }
     }
 
+
+    public ResponseEntity<?> validateRazorpayCredentials() {
+        Map<String, Object> response = new HashMap<>();
+        try {
+
+            PaymentGateway razorPay=this.paymentGatewayRepository.findByActiveTrue().get();
+
+            RazorpayClient razorpayClient=new RazorpayClient(razorPay.getApiKey(), razorPay.getSecretKey());
+            JSONObject options = new JSONObject();
+            options.put("count", 1); // ✅ limit results
+
+            razorpayClient.orders.fetchAll(options);
+
+             response.put("status", true);
+            response.put("message", "Razorpay credentials are valid");
+
+            return new ResponseEntity<>(response,HttpStatus.OK);
+            
+        } catch (Exception e) {
+           response.put("message", "Something went worng while validating razor pay creds "+e.getMessage());
+           response.put("status", false);
+           return new ResponseEntity<>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

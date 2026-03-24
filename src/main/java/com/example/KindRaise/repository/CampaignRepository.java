@@ -17,6 +17,7 @@ import org.springframework.stereotype.Repository;
 import com.example.KindRaise.dtos.CampaignDashboardDto;
 import com.example.KindRaise.dtos.CampaignDto;
 import com.example.KindRaise.dtos.CampaignImageDto;
+import com.example.KindRaise.dtos.CampaignTitleDto;
 import com.example.KindRaise.model.Campaign;
 
 @Repository
@@ -158,8 +159,14 @@ OR LOWER(c.description) LIKE LOWER(CONCAT('%', :search, '%'))
     Long countByUserId(String userId);
 
 
-   
+   @Query("""
+        
+        SELECT new com.example.KindRaise.dtos.CampaignTitleDto(
+        c.id,c.title,c.status
+        ) FROM Campaign c WHERE c.status!='PENDING' ORDER BY c.createdAt DESC
 
+        """)
+    List<CampaignTitleDto> findAllActiveCampaignTitleWithDto();
     
 
 
