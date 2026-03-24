@@ -90,14 +90,14 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
             c.status,
             c.user.id,
             c.user.fullName,
-             java.math.BigDecimal.ZERO,
+            (SELECT SUM(d.amount) FROM Donation d WHERE d.campaign.id=c.id),
              0L
             ) FROM Campaign c WHERE (:status IS NULL OR c.status=:status) AND(
             COALESCE(:search,'') = '' OR LOWER(c.title) LIKE LOWER(CONCAT('%', :search, '%')) 
 OR LOWER(c.description) LIKE LOWER(CONCAT('%', :search, '%')) 
             ) AND( :category IS NULL OR c.category.id=:category)
             """)
-    List<CampaignDto> findActiveCampaigns(@Param("search") String search,@Param("category") String category,@Param("status") String status); 
+    Page<CampaignDto> findActiveCampaigns(@Param("search") String search,@Param("category") String category,@Param("status") String status,Pageable pageable); 
     
     // For each row in Campaign table, create a new CampaignDto object using this constructor.
     @Query("""

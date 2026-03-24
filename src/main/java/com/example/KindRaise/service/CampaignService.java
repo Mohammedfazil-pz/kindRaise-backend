@@ -1,12 +1,12 @@
 package com.example.KindRaise.service;
 
-import java.math.BigDecimal;
+
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
 
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ import com.example.KindRaise.dtos.CampaignDashboardDto;
 import com.example.KindRaise.dtos.CampaignDto;
 import com.example.KindRaise.dtos.CampaignImageDto;
 import com.example.KindRaise.dtos.CampaignRequestDto;
-import com.example.KindRaise.dtos.CampaignTotalDonationDto;
+
 
 import com.example.KindRaise.model.Campaign;
 import com.example.KindRaise.model.Category;
@@ -102,15 +102,14 @@ public class CampaignService {
             // notification for user
             adminNotification.setTitle("New Campaign Request");
             adminNotification.setMessage("A new campaign was submitted by " + username);
-            adminNotification.setCreatedAt(LocalDateTime.now());
-            
+
             this.notificationService.addNotification(adminNotification);
             Notification userNotification=new Notification();
 
              userNotification.setTitle("Campaign Requested");
              userNotification.setMessage("Your campaign has been requested. please wait for the admin approval");
              userNotification.setUser(userDetails);
-             userNotification.setCreatedAt(LocalDateTime.now());
+         
 
             this.notificationService.addNotification(userNotification);
 
@@ -173,23 +172,16 @@ public class CampaignService {
     }
 
 
-    public ResponseEntity<?> getActiveCampaigns(String searchQuery,String category,String status) {
+    public ResponseEntity<?> getActiveCampaigns(String searchQuery,String category,String status,int currentPage,int size) {
         Map<String,Object> responseObject=new HashMap<>();
         try {
-            List<CampaignDto> campaigns=this.campaignRepository.findActiveCampaigns(searchQuery,category,status);
-            List<CampaignTotalDonationDto> campaignTotalDonationDtos=this.donationRepository.findTotalDonationsOfCampaign();
 
-            Map<String,BigDecimal> donationMap=campaignTotalDonationDtos.
-            stream()
-            .collect(Collectors.toMap(each->each.getCampaign_id(), each->each.getAmount()));
+            Pageable pageable=PageRequest.of(currentPage,size);
+            Page<CampaignDto> campaigns=this.campaignRepository.findActiveCampaigns(searchQuery,category,status,pageable);
+       
 
-            List<CampaignDto> campaignWithAmount=campaigns.stream().map((each)->{
-                BigDecimal totalAmount=donationMap.getOrDefault(each.getId(), BigDecimal.ZERO);
-                each.setAmount(totalAmount);
-                return each;
-            }).toList();
-            
-            return new ResponseEntity<>(campaignWithAmount,HttpStatus.OK);
+           
+            return new ResponseEntity<>(campaigns,HttpStatus.OK);
         } catch (Exception e) {
              responseObject.put("message", "Error on fetching campaigns "+e.getMessage());
              responseObject.put("status", false);

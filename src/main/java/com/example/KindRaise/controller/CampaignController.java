@@ -68,10 +68,12 @@ public class CampaignController {
     public ResponseEntity<?> getActiveCampaigns(
     @RequestParam(value = "search", required = false) String searchQuery,
     @RequestParam(value = "category", required = false) String category,
-    @RequestParam(value = "status",required = false) String status
+    @RequestParam(value = "status",required = false) String status,
+    @RequestParam(value = "page",defaultValue = "0")  int page,
+    @RequestParam(value = "size",defaultValue = "9") int size
 ){
         
-        return this.campaignService.getActiveCampaigns(searchQuery,category,status);
+        return this.campaignService.getActiveCampaigns(searchQuery,category,status,page,size);
     }
 
     

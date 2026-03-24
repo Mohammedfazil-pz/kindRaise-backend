@@ -65,5 +65,10 @@ public class UserController {
         return this.userService.getAllUsers(search,role,page);
     }
 
+     @PutMapping("/updatestatus/{userId}/{status}")
+    public ResponseEntity<?> changeAccountStatusOfUser(@PathVariable String userId,@PathVariable String status){
+        return this.userService.changeAccountStatusOfUser(userId, status);
+    } 
+
 
 }

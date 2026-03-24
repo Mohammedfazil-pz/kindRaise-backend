@@ -262,13 +262,21 @@ public class UserService {
        }
      }
 
+     public ResponseEntity<?> changeAccountStatusOfUser(String userId,String status){
+         Map<String,Object> responseObject=new HashMap<>();
+        try {
+            this.userRepository.updatedStatusOfUser(userId,status);
+           responseObject.put("message", "User status updated to " + status + " successfully.");
+           responseObject.put("status", true);
+            return new ResponseEntity<>(responseObject,HttpStatus.OK);
+        } catch (Exception e) {
+            responseObject.put("message", "Something went wrong Changing the status of User "+e.getMessage());
+           responseObject.put("status", false);
 
+           return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+     }
 
-     
-
-
-
-    
 
 
 

@@ -2,6 +2,7 @@ package com.example.KindRaise.model;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.Column;
@@ -28,6 +29,8 @@ public class Notification {
     @Column(nullable = false)
     private String message;
     private Boolean readStatus = false;
+    @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @ManyToOne

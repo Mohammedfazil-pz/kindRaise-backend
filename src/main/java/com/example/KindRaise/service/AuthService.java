@@ -1,6 +1,7 @@
 package com.example.KindRaise.service;
 
 
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -89,7 +90,7 @@ public class AuthService {
         }
     }
 
-    public ResponseEntity<?> createAdmin(User user){
+    public ResponseEntity<?> createUser(User user,MultipartFile file){
 
          Notification adminNotification=new Notification();
 
@@ -101,15 +102,38 @@ public class AuthService {
                 responseObject.put("status",false);
                 return new ResponseEntity<>(responseObject,HttpStatus.UNAUTHORIZED);
             }
-
+            
+            
+            user.setImageName(file.getOriginalFilename());
+            user.setImageData(file.getBytes());
+            user.setImageType(file.getContentType());
             user.setPassword(new BCryptPasswordEncoder(12).encode(user.getPassword()));
 
-            this.userRepository.save(user);
+            User userObject=this.userRepository.save(user);
 
-           adminNotification.setTitle("Admin Account Created");
-           adminNotification.setMessage("Administrator '" + user.getUsername() + "' has been successfully added.");
+            adminNotification.setTitle(user.getRole() + " Account Created");
 
-            responseObject.put("message", "Admin Created SuccessFully!");
+            adminNotification.setMessage(
+                user.getRole() + " '" + user.getUsername() + "' has been successfully added."
+            );
+             this.notificationService.addNotification(adminNotification);
+
+          if (user.getRole().equals("USER")) {
+
+                Notification userNotification = new Notification();
+
+                userNotification.setTitle("Welcome to KindRaise 🎉");
+
+                userNotification.setMessage(
+                    "Your account has been created by the admin. Welcome to KindRaise, " 
+                    + user.getUsername() + "! You can now explore and get started."
+                );
+
+                userNotification.setUser(userObject); 
+                this.notificationService.addNotification(userNotification);
+            }
+
+            responseObject.put("message", "User Created SuccessFully!");
             responseObject.put("status",true);
             responseObject.put("role", user.getRole());
             responseObject.put("username", user.getUsername());
@@ -132,6 +156,14 @@ public class AuthService {
 
             if(existingUser == null){
                 responseObject.put("message","User not found. Please register first.");
+                responseObject.put("status",false);
+                return new ResponseEntity<>(responseObject,HttpStatus.NOT_FOUND);
+         }
+
+         System.out.println(existingUser.getStatus());
+
+         if(!existingUser.getStatus().equals("ACTIVE")){
+                 responseObject.put("message","User account is inactive");
                 responseObject.put("status",false);
                 return new ResponseEntity<>(responseObject,HttpStatus.NOT_FOUND);
          }
