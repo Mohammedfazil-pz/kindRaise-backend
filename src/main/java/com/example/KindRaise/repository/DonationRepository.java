@@ -137,6 +137,15 @@ public interface DonationRepository extends JpaRepository<Donation,String>{
         List<DonationDto> findRecentThreeDonations();
 
 
+        @Query(value = """
+    SELECT TO_CHAR(d.donation_date, 'YYYY-MM-DD') as day,
+           COALESCE(SUM(d.amount), 0) as totalAmount
+    FROM donation d
+    WHERE  d.donation_date >= CURRENT_DATE - INTERVAL '7 days'
+    GROUP BY day
+    ORDER BY day
+""", nativeQuery = true)
+List<Object[]> dailyDonations();
         
 
     

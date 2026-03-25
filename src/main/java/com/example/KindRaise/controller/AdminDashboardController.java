@@ -64,5 +64,11 @@ public class AdminDashboardController {
     public ResponseEntity<?> getThreeRecentDonations(){
         return this.adminDashboardService.getThreeRecentDonations();
     }
+
+    @GetMapping("/dailydonations")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> dailyDonations(){
+        return this.adminDashboardService.dailyDonations();
+    }
     
 }

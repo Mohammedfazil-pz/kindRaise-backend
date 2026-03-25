@@ -1,10 +1,12 @@
 package com.example.KindRaise.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.stereotype.Service;
 
 import com.example.KindRaise.dtos.CampaignDto;
@@ -165,6 +168,44 @@ public class AdminDashboardService {
             responseObject.put("status", false);
 
             return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+      public ResponseEntity<?> dailyDonations(){
+        Map<String,Object> responseObject=new HashMap<>();
+        try {
+
+
+           List<Object[]> result = this.donationRepository.dailyDonations();
+
+
+                Map<String, BigDecimal> map = result.stream()
+                    .collect(Collectors.toMap(
+                        each -> (String) each[0],
+                        each -> (BigDecimal) each[1]
+                    ));
+
+                // ✅ Fill last 7 days
+                List<UserDashboardChartDto> finalList = new ArrayList<>();
+
+                for (int i = 6; i >= 0; i--) {
+                    LocalDate date = LocalDate.now().minusDays(i);
+                    String formatted = date.toString();
+
+                    finalList.add(new UserDashboardChartDto(
+                        formatted,
+                        map.getOrDefault(formatted, BigDecimal.ZERO)
+                    ));
+                }     
+
+            return new ResponseEntity<>(finalList,HttpStatus.OK);
+            
+        } catch (Exception e) {
+           responseObject.put("message", "Something went wrong While Fetching User Dashbpard"+e.getMessage());
+           responseObject.put("status", false);
+
+           return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     
