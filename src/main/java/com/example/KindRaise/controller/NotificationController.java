@@ -2,6 +2,7 @@ package com.example.KindRaise.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -26,6 +27,14 @@ public class NotificationController {
         return this.notificationService.getUserNotifications(page,size);
     }
 
+    @GetMapping("/admin")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getAdminNotifications(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "5") int size){
+        return this.notificationService.getAdminNotifications(page,size);
+    }
+
     @PutMapping("/read/notification/{id}")
     public ResponseEntity<?> markAsReadNotification(@PathVariable String id){
         System.out.println(id);
@@ -35,6 +44,12 @@ public class NotificationController {
     @PutMapping("/read/all/notification")
     public ResponseEntity<?> markAllNotificationOfUserAsRead(){
         return this.notificationService.markAllNotificationOfUserAsRead();
+    }
+
+    @PutMapping("/read/all/notification/admin")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> markAllAdminNotificationAsRead(){
+        return this.notificationService.markAllAdminNotificationAsRead();
     }
 
     @GetMapping("/count/unread")

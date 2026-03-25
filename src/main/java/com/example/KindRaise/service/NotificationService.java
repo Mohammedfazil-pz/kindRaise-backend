@@ -39,9 +39,8 @@ public class NotificationService {
     public ResponseEntity<?> getUserNotifications(int page,int size){
         Map<String,Object> responseObject=new HashMap<>();
         try {
-
             String username=SecurityContextHolder.getContext().getAuthentication().getName();
-            System.out.println(username);
+           
             User user=this.userRepository.findUserWithoutImage(username);
 
             Pageable pageable=PageRequest.of(page, size);
@@ -56,7 +55,7 @@ public class NotificationService {
             return new ResponseEntity<>(notifications,HttpStatus.OK);
 
         } catch (Exception e) {
-            responseObject.put("message", "Something went wrong "+e.getMessage());
+            responseObject.put("message", "Something went wrong while fetching notifications"+e.getMessage());
             responseObject.put("status", false);
 
             return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
@@ -115,10 +114,16 @@ public class NotificationService {
     public ResponseEntity<?> countTotalNumberOfNotificationsUnRead(){
         Map<String,Object> responseObject=new HashMap<>();
         try {
+            Long result;
             String username=SecurityContextHolder.getContext().getAuthentication().getName();
             User user=this.userRepository.findUserWithoutImage(username);
 
-            Long result=this.notificationRepository.countByUserIdAndReadStatus(user.getId(), false);
+            if(user.getRole().equals("USER")){
+                result=this.notificationRepository.countByUserIdAndReadStatus(user.getId(), false);
+            }else{
+                 result=this.notificationRepository.countByUserIdIsNullAndReadStatusIsFalse();
+            }
+ 
              responseObject.put("total",result);
             responseObject.put("status",true);
 
@@ -126,6 +131,34 @@ public class NotificationService {
 
         } catch (Exception e) {
             responseObject.put("message", "Something went wrong While Couting the notifications "+e.getMessage());
+            responseObject.put("status", false);
+
+            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<?> getAdminNotifications(int currentPage,int size){
+          Map<String,Object> responseObject=new HashMap<>();
+        try {
+            Pageable pageable=PageRequest.of(currentPage, size);
+            Page<UserNotificationDto> adminNotifications=this.notificationRepository.findByUserIdIsNullOrderByCreatedAtDesc(pageable);
+            return new ResponseEntity<>(adminNotifications,HttpStatus.OK);
+        } catch (Exception e) {
+            responseObject.put("message", "Something went wrong while fetching notifications"+e.getMessage());
+            responseObject.put("status", false);
+
+            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    public ResponseEntity<?> markAllAdminNotificationAsRead(){
+          Map<String,Object> responseObject=new HashMap<>();
+        try {
+            this.notificationRepository.markAllNotificationOfAdminAsRead();
+            responseObject.put("message","Marked all notifications as read");
+            responseObject.put("status",true);
+            return new ResponseEntity<>(responseObject,HttpStatus.OK);
+        } catch (Exception e) {
+            responseObject.put("message", "Something went wrong while Marking All Read "+e.getMessage());
             responseObject.put("status", false);
 
             return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
