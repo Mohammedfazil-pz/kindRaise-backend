@@ -18,5 +18,6 @@ public class DonationDto {
     private String transactionId;
     private String user_id;
     private String fullName;
+    private String campaign_id;
     
 }

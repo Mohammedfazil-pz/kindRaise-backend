@@ -11,7 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-
+import com.example.KindRaise.dtos.CampaignTopRaisedDto;
 import com.example.KindRaise.dtos.CampaignTotalDonationDto;
 import com.example.KindRaise.dtos.DonationDto;
 import com.example.KindRaise.dtos.DonationUserStatsDto;
@@ -22,7 +22,7 @@ import com.example.KindRaise.model.Donation;
 public interface DonationRepository extends JpaRepository<Donation,String>{
     @Query("""
             SELECT new com.example.KindRaise.dtos.DonationDto(
-            d.id,d.campaign.title,d.amount,d.createdAt,d.transactionId,d.user.id,d.user.fullName
+            d.id,d.campaign.title,d.amount,d.createdAt,d.transactionId,d.user.id,d.user.fullName,d.campaign.id
             ) FROM Donation d WHERE d.campaign.id=:id
             """)
     List<DonationDto> findByCampaignIdByDto(@Param("id") String id);
@@ -39,7 +39,7 @@ public interface DonationRepository extends JpaRepository<Donation,String>{
 
     @Query("""
             SELECT new com.example.KindRaise.dtos.DonationDto(
-            d.id,d.campaign.title,d.amount,d.createdAt,d.transactionId,d.user.id,d.user.fullName
+            d.id,d.campaign.title,d.amount,d.createdAt,d.transactionId,d.user.id,d.user.fullName,d.campaign.id
             ) FROM Donation d WHERE COALESCE(:search,'') = '' OR 
              LOWER(d.user.fullName) LIKE LOWER(CONCAT('%',:search,'%')) OR 
              LOWER(d.campaign.title) LIKE LOWER(CONCAT('%',:search,'%'))
@@ -66,7 +66,7 @@ public interface DonationRepository extends JpaRepository<Donation,String>{
     
         @Query("""
                   SELECT new com.example.KindRaise.dtos.DonationDto(
-                 d.id,d.campaign.title,d.amount,d.createdAt,d.transactionId,d.user.id,null
+                 d.id,d.campaign.title,d.amount,d.createdAt,d.transactionId,d.user.id,null,d.campaign.id
                 ) FROM Donation d WHERE d.user.id=:id ORDER BY d.donationDate DESC LIMIT 1
                 """)
                 DonationDto findTopByUserIdOrderByDonationDateDesc(@Param("id")String donorId);
@@ -81,6 +81,16 @@ public interface DonationRepository extends JpaRepository<Donation,String>{
                         ORDER BY month
                 """, nativeQuery = true)
         List<Object[]> userDonationsPerMonth(@Param("id") String userId);
+
+
+         @Query(value = """
+                 SELECT TO_CHAR(d.donation_date, 'YYYY-MM') as month,
+                 COALESCE(SUM(d.amount), 0) as totalAmount
+                 FROM donation d
+                        GROUP BY month
+                        ORDER BY month
+                """, nativeQuery = true)
+        List<Object[]> totalDonationsPerMonth();
 
 
          @Query("""
@@ -107,6 +117,24 @@ public interface DonationRepository extends JpaRepository<Donation,String>{
                 SELECT COUNT(DISTINCT d.campaign.id) FROM Donation d WHERE d.user.id=:id
                         """)
         Long totalCampaignsSupported(String id);
+
+
+        @Query("""
+                SELECT new com.example.KindRaise.dtos.CampaignTopRaisedDto(
+                d.campaign.id,d.campaign.title,COALESCE(SUM(d.amount),0),d.campaign.goalAmount
+                ) FROM Donation d GROUP BY d.campaign.id,d.campaign.title,d.campaign.goalAmount ORDER BY
+                 COALESCE(SUM(d.amount),0) DESC LIMIT 3
+                        """)
+
+        List<CampaignTopRaisedDto> findTopThreeRaisedCampaigns();  
+        
+        
+        @Query("""
+                 SELECT new com.example.KindRaise.dtos.DonationDto(
+                 d.id,d.campaign.title,d.amount,d.createdAt,d.transactionId,d.user.id,d.user.fullName,d.campaign.id
+                ) FROM Donation d ORDER BY d.createdAt DESC LIMIT 3
+                        """)
+        List<DonationDto> findRecentThreeDonations();
 
 
         

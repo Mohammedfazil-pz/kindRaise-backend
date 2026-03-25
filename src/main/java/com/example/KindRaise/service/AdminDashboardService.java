@@ -15,7 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.example.KindRaise.dtos.CampaignDto;
+import com.example.KindRaise.dtos.CampaignTopRaisedDto;
 import com.example.KindRaise.dtos.DonationDto;
+import com.example.KindRaise.dtos.UserDashboardChartDto;
 import com.example.KindRaise.model.User;
 import com.example.KindRaise.repository.CampaignRepository;
 import com.example.KindRaise.repository.DonationRepository;
@@ -118,6 +120,48 @@ public class AdminDashboardService {
             
         } catch (Exception e) {
             responseObject.put("message", "Failed to fetch analytics details "+e.getMessage());
+            responseObject.put("status", false);
+
+            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<?> getTotalDonationsAnalytics(){
+         Map<String,Object> responseObject=new HashMap<>();
+        try {
+             List<Object[]> userDonations=this.donationRepository.totalDonationsPerMonth();
+             List<UserDashboardChartDto> result=userDonations.stream()
+            .map((each)->new UserDashboardChartDto((String)each[0],(BigDecimal)each[1])).toList();
+
+           return new ResponseEntity<>(result,HttpStatus.OK);
+        } catch (Exception e) {
+            responseObject.put("message", "Failed to fetch analytics of donations "+e.getMessage());
+            responseObject.put("status", false);
+
+            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<?> getTopThreeRaisedCampaigns(){
+         Map<String,Object> responseObject=new HashMap<>();
+        try {
+            List<CampaignTopRaisedDto> topRaisedCampaigns=this.donationRepository.findTopThreeRaisedCampaigns();
+            return new ResponseEntity<>(topRaisedCampaigns,HttpStatus.OK);
+        } catch (Exception e) {
+            responseObject.put("message", "Failed to fetch Top Three Raised Campaigns "+e.getMessage());
+            responseObject.put("status", false);
+
+            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<?> getThreeRecentDonations() {
+        Map<String,Object> responseObject=new HashMap<>();
+        try {
+            List<DonationDto> topThreeRecentDonations=this.donationRepository.findRecentThreeDonations();
+            return new ResponseEntity<>(topThreeRecentDonations,HttpStatus.OK);
+        } catch (Exception e) {
+            responseObject.put("message", "Failed to fetch Top Three Recent donations"+e.getMessage());
             responseObject.put("status", false);
 
             return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);

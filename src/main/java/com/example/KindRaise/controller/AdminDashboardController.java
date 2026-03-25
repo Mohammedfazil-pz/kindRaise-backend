@@ -46,5 +46,23 @@ public class AdminDashboardController {
     public ResponseEntity<?> getAdminAnalyticsPageStatsData(){
         return this.adminDashboardService.getAdminAnalyticsPageStatsData();
     }
+
+    @GetMapping("/analytics/donations")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getTotalDonationsAnalytics(){
+        return this.adminDashboardService.getTotalDonationsAnalytics();
+    }
+    
+    @GetMapping("/analytics/top/raised/campaigns")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getTopThreeRaisedCampaigns(){
+        return this.adminDashboardService.getTopThreeRaisedCampaigns();
+    }
+
+    @GetMapping("/analytics/recent/donations")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getThreeRecentDonations(){
+        return this.adminDashboardService.getThreeRecentDonations();
+    }
     
 }
