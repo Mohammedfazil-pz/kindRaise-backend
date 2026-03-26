@@ -33,5 +33,25 @@
     "name": "spring.paypal.main.order.url",
     "type": "java.lang.String",
     "description": "A description for 'spring.paypal.main.order.url'"
+  },
+  {
+    "name": "spring.openai.secret.key",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.openai.secret.key'"
+  },
+  {
+    "name": "spring.gemmini.secret.key",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.gemmini.secret.key'"
+  },
+  {
+    "name": "spring.gemini.secret.key",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.gemini.secret.key'"
+  },
+  {
+    "name": "spring.gemini.model",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.gemini.model'"
   }
 ]}
