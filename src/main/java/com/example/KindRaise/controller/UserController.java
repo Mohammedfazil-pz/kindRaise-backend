@@ -3,6 +3,7 @@ package com.example.KindRaise.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -58,6 +59,7 @@ public class UserController {
 
 
     @GetMapping("/all")
+      @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getAllUsers(
     @RequestParam(defaultValue = "") String search,
     @RequestParam(defaultValue = "") String role,
@@ -66,8 +68,15 @@ public class UserController {
     }
 
      @PutMapping("/updatestatus/{userId}/{status}")
+       @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> changeAccountStatusOfUser(@PathVariable String userId,@PathVariable String status){
         return this.userService.changeAccountStatusOfUser(userId, status);
+    } 
+
+     @GetMapping("/all/once")
+     @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getAllUsersInOneCall(){
+        return this.userService.getAllUsersInOneCall();
     } 
 
 

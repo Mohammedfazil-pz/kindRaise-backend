@@ -95,6 +95,27 @@ public interface UserRepository extends JpaRepository<User,String>  {
       List<User> findAllUserWithoutImage(Pageable pageable);
 
 
+       @Query("""
+        SELECT new com.example.KindRaise.model.User(
+        u.id,
+        u.username,
+        u.password,
+        u.role,
+         u.status,
+        u.phone,
+        u.fullName,
+        u.DOB,
+        null,
+        null,
+        null,
+        u.createdAt
+        )
+        FROM User u  ORDER BY u.createdAt DESC
+        """)
+      List<User> findAllUserInOneCall();
+      
+
+
       Long countByRole(String role);
 
      @Query("""

@@ -44,4 +44,11 @@ public class TransactionController {
         return this.transactionService.getUserTransactions(id, page,size);
     }
 
+
+     @GetMapping("/admin/all/once")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getAllTransactionsInOneCall(){
+        return this.transactionService.getAllTransactionsInOneCall();
+    }
+
 }

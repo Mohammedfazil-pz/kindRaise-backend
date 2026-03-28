@@ -54,4 +54,10 @@ public class DonationController {
     public ResponseEntity<?> getAdminDashboardDonationStats(){
         return this.donationService.getAdminDashboardDonationStats();
     }
+
+    @GetMapping("/admin/all/once")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> fetchAllDonations(){
+        return this.donationService.fetchAllDonations();
+    }
 }

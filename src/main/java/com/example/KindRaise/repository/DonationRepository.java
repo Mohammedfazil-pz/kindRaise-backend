@@ -137,6 +137,14 @@ public interface DonationRepository extends JpaRepository<Donation,String>{
         List<DonationDto> findRecentThreeDonations();
 
 
+        @Query("""
+                 SELECT new com.example.KindRaise.dtos.DonationDto(
+                 d.id,d.campaign.title,d.amount,d.createdAt,d.transactionId,d.user.id,d.user.fullName,d.campaign.id
+                ) FROM Donation d ORDER BY d.createdAt DESC 
+                        """)
+        List<DonationDto> fetchAllDonations();
+
+
         @Query(value = """
     SELECT TO_CHAR(d.donation_date, 'YYYY-MM-DD') as day,
            COALESCE(SUM(d.amount), 0) as totalAmount

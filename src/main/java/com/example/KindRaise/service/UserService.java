@@ -3,6 +3,7 @@ package com.example.KindRaise.service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -275,6 +276,23 @@ public class UserService {
 
            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
         }
+     }
+
+
+
+     public ResponseEntity<?> getAllUsersInOneCall() {
+         Map<String,Object> responseObject=new HashMap<>();
+       try {
+
+        List<User> allUsers=this.userRepository.findAllUserInOneCall();
+        return new ResponseEntity<>(allUsers,HttpStatus.OK);
+
+       } catch (Exception e) {
+           responseObject.put("message", "Something went wrong While Fetching users"+e.getMessage());
+           responseObject.put("status", false);
+
+           return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+       }
      }
 
 

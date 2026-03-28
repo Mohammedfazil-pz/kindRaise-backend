@@ -219,6 +219,21 @@ public class DonationService {
         }
     }
 
+
+     public ResponseEntity<?> fetchAllDonations() {
+        Map<String,Object> responseObject=new HashMap<>();
+        try {
+            List<DonationDto> allDonations=this.donationRepository.fetchAllDonations();
+            return new ResponseEntity<>(allDonations,HttpStatus.OK);
+            
+        } catch (Exception e) {
+            responseObject.put("message", "Something went wrong while fetching all donations "+e.getMessage());
+            responseObject.put("status", false);
+
+            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     
 
 }

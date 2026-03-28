@@ -38,6 +38,22 @@ public class TransactionService {
         }
     }
 
+
+    
+     public ResponseEntity<?> getAllTransactionsInOneCall() {
+          Map<String,Object> responseObject=new HashMap<>();
+        try {
+           
+            List<TransactionDto> transactions=this.transactionRepository.findAllTransactionsInOneCallByDto();
+            return new ResponseEntity<>(transactions,HttpStatus.OK);
+        } catch (Exception e) {
+            responseObject.put("message", "Failed to fetch All Transactions "+e.getMessage());
+            responseObject.put("status", false);
+
+            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     public ResponseEntity<?> getUserTransactions(String userId,int currentPage,int size){
         Map<String,Object> responseObject=new HashMap<>();
         try {

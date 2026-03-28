@@ -24,7 +24,15 @@ public interface TransactionRepository extends JpaRepository<PaymentTransaction,
              AND (COALESCE(:campaignId,'')='' OR t.campaign.id=:campaignId) AND
              (COALESCE(:status,'')='' OR t.transactionStatus=:status) ORDER BY transactionDate DESC
             """)
-    public Page<TransactionDto> findAllTransactionsByDto(String search,String campaignId,String status,Pageable page);
+     Page<TransactionDto> findAllTransactionsByDto(String search,String campaignId,String status,Pageable page);
+
+
+    @Query("""
+            SELECT new com.example.KindRaise.dtos.TransactionDto(
+            t.id,t.amount,t.transactionStatus,t.PaymentReference,t.transactionDate,t.campaign.id,t.campaign.title,t.user.id,t.user.fullName,t.paymentMethod
+            ) FROM PaymentTransaction t  ORDER BY t.transactionDate DESC
+            """)
+     List<TransactionDto> findAllTransactionsInOneCallByDto();
 
     @Query("""
              SELECT new com.example.KindRaise.dtos.TransactionDto(
