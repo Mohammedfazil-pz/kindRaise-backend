@@ -32,8 +32,8 @@ public class DonationController {
 
     @GetMapping("/user")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    public ResponseEntity<?> getUserDonations(){
-        return this.donationService.getUserDonations();
+    public ResponseEntity<?> getUserDonations(@RequestParam int page){
+        return this.donationService.getUserDonations(page);
     }
 
     @GetMapping("/all")

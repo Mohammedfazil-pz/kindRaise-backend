@@ -27,6 +27,30 @@ public interface TransactionRepository extends JpaRepository<PaymentTransaction,
      Page<TransactionDto> findAllTransactionsByDto(String search,String campaignId,String status,Pageable page);
 
 
+     @Query("""
+            SELECT new com.example.KindRaise.dtos.TransactionDto(
+            t.id,t.amount,t.transactionStatus,t.PaymentReference,t.transactionDate,t.campaign.id,t.campaign.title,t.user.id,t.user.fullName,t.paymentMethod
+            ) FROM PaymentTransaction t WHERE 
+             (
+                (:type='INCOME' AND t.campaign.user.id=:ownerId AND t.transactionStatus='SUCCESS')
+                OR
+                (:type='OUTCOME' AND t.user.id=:ownerId AND t.transactionStatus='SUCCESS')
+                OR
+                (
+                 (:type IS NULL OR :type = '')
+                 AND
+                (t.user.id = :ownerId OR t.campaign.user.id = :ownerId)
+                )
+             ) AND
+           
+             (COALESCE(:search,'')='' OR LOWER(t.user.fullName) LIKE LOWER(CONCAT('%',:search,'%')) OR
+             LOWER(t.campaign.title) LIKE LOWER(CONCAT('%',:search,'%'))
+             )
+             AND (COALESCE(:campaignId,'')='' OR t.campaign.id=:campaignId) ORDER BY transactionDate DESC
+            """)
+     Page<TransactionDto> findAllTransactionsByDtoWwithOwnerId(String search,String campaignId,String type,Pageable page,String ownerId);
+
+
     @Query("""
             SELECT new com.example.KindRaise.dtos.TransactionDto(
             t.id,t.amount,t.transactionStatus,t.PaymentReference,t.transactionDate,t.campaign.id,t.campaign.title,t.user.id,t.user.fullName,t.paymentMethod

@@ -115,6 +115,12 @@ public class CampaignController {
         return this.campaignService.fetchAllActiveCampaignsTitle();
     }
 
+    @GetMapping("/titles/user")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> fetchAllActiveCampaignsTitleByOwnerId(){
+        return this.campaignService.fetchAllActiveCampaignsTitleByOwnerId();
+    }
+
    
 
     

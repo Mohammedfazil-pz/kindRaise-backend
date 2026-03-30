@@ -31,11 +31,11 @@ public interface DonationRepository extends JpaRepository<Donation,String>{
             SELECT new com.example.KindRaise.dtos.UserDonationDto(
            d.campaign.title,d.campaign.description,COALESCE(SUM(d.amount),0),
            (SELECT SUM(d2.amount) FROM Donation d2 WHERE d2.campaign.id=d.campaign.id),
-           d.campaign.goalAmount,d.campaign.id
+           d.campaign.goalAmount,d.campaign.id,d.campaign.deadline
             ) FROM Donation d  WHERE d.user.id=:id GROUP BY 
-             d.campaign.title,d.campaign.id,d.campaign.description,d.campaign.goalAmount
+             d.campaign.title,d.campaign.id,d.campaign.description,d.campaign.goalAmount,d.campaign.deadline
             """)
-    List<UserDonationDto> findDonationByUserId(@Param("id") String id);
+    Page<UserDonationDto> findDonationByUserId(@Param("id") String id,Pageable pageable);
 
     @Query("""
             SELECT new com.example.KindRaise.dtos.DonationDto(

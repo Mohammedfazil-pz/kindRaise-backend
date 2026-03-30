@@ -29,6 +29,19 @@ public class TransactionController {
     ){
         return this.transactionService.getAllTransactions(page,size,campaignId,status,search);
     }
+
+     @GetMapping("/all/user")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> getAllTransactionsByOwnerId(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "8") int size,
+        @RequestParam(required = false) String campaignId,
+        @RequestParam(required = false) String type,
+        @RequestParam(required = false) String search
+    ){
+        System.out.println(type);
+        return this.transactionService.getAllTransactionsByOwnerId(page,size,campaignId,type,search);
+    }
     @GetMapping("/user/all/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getUserAllTransactionsInOneCall(@PathVariable String id){

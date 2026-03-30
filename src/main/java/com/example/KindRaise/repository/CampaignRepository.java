@@ -167,6 +167,15 @@ OR LOWER(c.description) LIKE LOWER(CONCAT('%', :search, '%'))
 
         """)
     List<CampaignTitleDto> findAllActiveCampaignTitleWithDto();
+
+   @Query("""
+        
+        SELECT new com.example.KindRaise.dtos.CampaignTitleDto(
+        c.id,c.title,c.status
+        ) FROM Campaign c WHERE c.status!='PENDING' AND c.user.id=:id ORDER BY c.createdAt DESC
+
+        """)
+    List<CampaignTitleDto> findAllActiveCampaignTitleWithDtoByOwnerId(String id);
     
 
      Long countByStatusIn(List<String> statuses);

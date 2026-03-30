@@ -381,6 +381,20 @@ public class CampaignService {
             return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
          }
     }
+    public ResponseEntity<?> fetchAllActiveCampaignsTitleByOwnerId(){
+         Map<String,Object> responseObject=new HashMap<>();
+         try {
+            String username=SecurityContextHolder.getContext().getAuthentication().getName();
+            User user=this.userRepository.findUserWithoutImage(username);
+            List<CampaignTitleDto> campaignTitleDtos=this.campaignRepository.findAllActiveCampaignTitleWithDtoByOwnerId(user.getId());
+            return new ResponseEntity<>(campaignTitleDtos,HttpStatus.OK);
+         } catch (Exception e) {
+            responseObject.put("message", "Failed to fetch all Campaigns Title "+e.getMessage());
+            responseObject.put("status", false);
+
+            return new ResponseEntity<>(responseObject,HttpStatus.INTERNAL_SERVER_ERROR);
+         }
+    }
 
     
 

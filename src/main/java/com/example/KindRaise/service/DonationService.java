@@ -135,12 +135,13 @@ public class DonationService {
         }
     }
 
-    public ResponseEntity<?> getUserDonations(){
+    public ResponseEntity<?> getUserDonations(int currentPage){
         try {
 
             String username=SecurityContextHolder.getContext().getAuthentication().getName();
             User userDetails=this.userRepository.findUserWithoutImage(username);
-            List<UserDonationDto> donations=this.donationRepository.findDonationByUserId(userDetails.getId());
+            Pageable pageable=PageRequest.of(currentPage,9);
+            Page<UserDonationDto> donations=this.donationRepository.findDonationByUserId(userDetails.getId(),pageable);
             return new ResponseEntity<>(donations,HttpStatus.OK);
         } catch (Exception e) {
             responseObject.put("message", "Failed to fetch User donations "+e.getMessage());
