@@ -39,7 +39,7 @@ public class SpringCustomizedConfig {
         httpSecurity.cors(cors->{});
         httpSecurity.csrf(csrf->csrf.disable());
         httpSecurity.authorizeHttpRequests(httpRequests->httpRequests
-            .requestMatchers("/api/register","/api/login","/api/admin/create/admin","/api/checkusername/{username}","/api/campaign/active/campaigns","/api/campaign/image/campaign/{id}","/api/category/get","/api/user/profile/image/{id}","/api/genai/chat","/api/ticket/create")
+            .requestMatchers("/api/register","/api/login","/api/admin/create/admin","/api/checkusername/{username}","/api/campaign/active/campaigns","/api/campaign/image/campaign/{id}","/api/category/get","/api/user/profile/image/{id}","/api/genai/chat","/api/ticket/create","/api/testimonial/all/active","/api/testimonial/image/{id}")
             .permitAll()
             .anyRequest()
             .authenticated());

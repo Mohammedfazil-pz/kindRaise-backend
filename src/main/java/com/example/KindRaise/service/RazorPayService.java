@@ -50,10 +50,10 @@ public class RazorPayService {
     @Autowired
     DonationService donationService;
 
-    Map<String,Object> responseObject=new HashMap<>();
+   
 
     public Map<String,Object> createOrder(BigDecimal amount,String campaignId){
-
+         Map<String,Object> responseObject=new HashMap<>();
        try {
          Optional<PaymentGateway> isPaymentGatewayExists=this.paymentGatewayRepository.findByActiveTrue();
 
@@ -115,7 +115,7 @@ public class RazorPayService {
 
 
     public ResponseEntity<?> verifySignature(RazorPayResponseDto razorPayResponseDto) {
-
+         Map<String,Object> responseObject=new HashMap<>();
     try {
         Optional<PaymentGateway> gatewayOptional = paymentGatewayRepository.findByActiveTrue();
 
@@ -199,6 +199,7 @@ public class RazorPayService {
 
 
     public void failedPayment(RazorPayResponseDto razorPayResponseDto) {
+      
         try {
           
              Optional<Campaign> campaign=this.campaignRepository.findById(razorPayResponseDto.getCampaignID());
@@ -219,6 +220,7 @@ public class RazorPayService {
 
 
     public ResponseEntity<?> validateRazorpayCredentials() {
+       
         Map<String, Object> response = new HashMap<>();
         try {
 
