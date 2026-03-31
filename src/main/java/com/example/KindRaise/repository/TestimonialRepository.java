@@ -28,7 +28,7 @@ public interface TestimonialRepository extends JpaRepository<Testimonial,String>
             t.rating,
             t.status,
             t.user.id
-            ) FROM Testimonial t ORDER BY t.createdAt DESC
+            ) FROM Testimonial t ORDER BY t.status DESC
             """)
     Page<TestimonialDto> fetchAllTestimonialsWithDto(Pageable pageable);
 

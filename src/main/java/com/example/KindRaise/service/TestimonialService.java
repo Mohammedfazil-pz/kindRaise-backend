@@ -77,7 +77,7 @@ public class TestimonialService {
           Map<String,Object> hasMap=new HashMap<>();
         try {
 
-            Pageable pageable=PageRequest.of(currentPage,7);
+            Pageable pageable=PageRequest.of(currentPage,9);
             Page<TestimonialDto> testimonials=this.TestimonialRepository.fetchAllTestimonialsWithDto(pageable);
 
             return new ResponseEntity<>(testimonials,HttpStatus.OK);
